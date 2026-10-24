@@ -2,9 +2,9 @@ import React, { useState,useEffect } from "react";
 import { FaDownload, FaEnvelope, FaPhone, FaGlobe, FaCalendarAlt,FaRupeeSign,FaRegClock } from "react-icons/fa";
 import "chart.js/auto";
 import { useParams } from "react-router-dom";
-import { useSelector, useDispatch } from 'react-redux';
-import {cacheUser} from '../../Redux/Slice'
-import { apiUrl } from "../../utils/api";
+import { useSelector, useDispatch } from "react-redux";
+import { cacheUser } from "../../Redux/Slice";
+import { apiUrl, authHeaders } from "../../utils/api";
 
 
 const PayrollPage = () => {
@@ -58,7 +58,9 @@ const FetchEmployee = async()=>{
   try{
   
     
-    const response= await fetch(apiUrl(`/api/users/${id}`));
+    const response = await fetch(apiUrl(`/api/users/${id}`), {
+      headers: authHeaders(),
+    });
     
       if(!response.ok){
             throw new Error("Failed to fetch employees");
@@ -83,10 +85,16 @@ console.log(employee)
  <div className="bg-white w-full lg:w-1/5 rounded-2xl shadow-md p-6 text-sm text-gray-700 space-y-6">
   {/* Profile Header */}
   <div className="flex flex-col items-center text-center">
-      <img src="https://i.pravatar.cc/100?img=56" alt="Employee" className="w-24 h-24 rounded-full mb-4 shadow" />
-      <h3 className="text-lg font-semibold">{employee.username}</h3>
-      <p className="text-sm text-gray-500">UX Designer</p>
+    <div className="w-24 h-24 rounded-full mb-4 bg-slate-100 border-2 border-slate-200 flex items-center justify-center text-slate-700 font-extrabold text-3xl shadow-inner select-none">
+      {employee?.username ? employee.username.charAt(0).toUpperCase() : (
+        <svg className="w-12 h-12 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+        </svg>
+      )}
     </div>
+    <h3 className="text-lg font-semibold text-slate-800">{employee.username}</h3>
+    <p className="text-sm text-slate-500">{employee.designation || employee.role || "Employee"}</p>
+  </div>
 
   {/* Info Section */}
   <div>
@@ -145,15 +153,6 @@ salary}</p>
         </div>
       </div>
 
-      <div className="flex items-start gap-3">
-        <FaGlobe className="text-gray-500 mt-1" />
-        <div>
-          <p className="text-xs text-gray-500">Website</p>
-          <a href="https://bit.ly/3uOJF79" className="text-sm text-blue-600 underline">
-            https://bit.ly/3uOJF79
-          </a>
-        </div>
-      </div>
     </div>
   </div>
 </div>
@@ -177,7 +176,9 @@ function InfoTab() {
 
     const fetchSalaryInfo = async () => {
       try {
-        const response = await fetch(apiUrl(`/api/usersalaryinfo/${id}`));
+        const response = await fetch(apiUrl(`/api/usersalaryinfo/${id}`), {
+          headers: authHeaders(),
+        });
 
         if (!response.ok) {
           setMessage("Salary data is not found for this user. Please add the user info.");
@@ -241,11 +242,12 @@ function InfoTab() {
           </div>
 
           {/* Updates */}
+          {/* Updates */}
           <div>
             <h4 className="text-md font-semibold mb-2 text-indigo-600">🔄 Updates</h4>
             <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-              <p><span className="font-medium">Updated By:</span> {employee.updated_by}</p>
-               <p><span className="font-medium">Last Update:</span> {(employee.last_update).split("T")[0]}</p>
+              <p><span className="font-medium">Updated By:</span> {employee.updated_by || "System"}</p>
+              <p><span className="font-medium">Last Update:</span> {String(employee.last_update || "").split("T")[0] || "N/A"}</p>
             </div>
           </div>
 
@@ -253,7 +255,7 @@ function InfoTab() {
           <div className="pt-4">
             <button
               onClick={() => openModal("update", employee)}
-              className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+              className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 font-medium transition shadow-sm"
             >
               ✏️ Update Salary Info
             </button>
@@ -266,7 +268,7 @@ function InfoTab() {
           {showAddButton && (
             <button
               onClick={() => openModal("add")}
-              className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 font-medium transition shadow-sm"
             >
               ➕ Add Salary Info
             </button>
@@ -281,6 +283,9 @@ function InfoTab() {
           employeeId={id}
           defaultData={formMode === "update" ? selectedEmployeeData : {}}
           onClose={() => setShowModal(false)}
+          onSuccess={() => {
+            fetchSalaryInfo();
+          }}
         />
       )}
     </div>
@@ -288,39 +293,71 @@ function InfoTab() {
 }
 
 
-const SalaryModal = ({ mode = "add", employeeId, defaultData = {}, onClose }) => {
-    const user = useSelector((state) => state.auth.user);
-    console.log("Hr data is",user.username)
+const SalaryModal = ({ mode = "add", employeeId, defaultData = {}, onClose, onSuccess }) => {
+  const user = useSelector((state) => state.auth.user);
+  
   const [formData, setFormData] = useState({
-    employee_id: "",
+    employee_id: employeeId || "",
     employee_name: "",
     base_salary: "",
     hra: "",
-    bonus: "",
-    tax_percent: "",
-    pf_percent: "",
+    bonus: "5000",
+    tax_percent: "10",
+    pf_percent: "12",
+    paid_leaves_allowed: "2",
     joining_date: "",
-    updated_by: user.username,
+    updated_by: user?.username || "Admin",
   });
 
   const [message, setMessage] = useState("");
-  
+  const [submitting, setSubmitting] = useState(false);
 
-  // Pre-fill form for update
+  // Pre-fill form
   useEffect(() => {
-    if (mode === "update" && defaultData) {
-      setFormData({ ...defaultData });
+    if (mode === "update" && defaultData && Object.keys(defaultData).length > 0) {
+      setFormData({
+        ...defaultData,
+        updated_by: user?.username || "Admin",
+      });
     } else {
-      setFormData((prev) => ({ ...prev, employee_id: employeeId }));
+      // Fetch user profile to pre-fill name and base salary
+      fetch(apiUrl(`/api/getuser/${employeeId}`))
+        .then((r) => r.json())
+        .then((data) => {
+          if (data && data.user) {
+            const base = data.user.salary || 75000;
+            setFormData((prev) => ({
+              ...prev,
+              employee_id: employeeId,
+              employee_name: data.user.username || "",
+              base_salary: base,
+              hra: Math.round(base * 0.4),
+              joining_date: data.user.joigningDate || new Date().toISOString().split("T")[0],
+            }));
+          }
+        })
+        .catch(() => {
+          setFormData((prev) => ({ ...prev, employee_id: employeeId }));
+        });
     }
   }, [defaultData, mode, employeeId]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: value };
+      // Auto-compute HRA as 40% when base salary changes if HRA was empty
+      if (name === "base_salary" && value) {
+        updated.hra = Math.round(Number(value) * 0.4);
+      }
+      return updated;
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
+    setMessage("");
 
     const url =
       mode === "add"
@@ -333,6 +370,7 @@ const SalaryModal = ({ mode = "add", employeeId, defaultData = {}, onClose }) =>
       const response = await fetch(url, {
         method,
         headers: {
+          ...authHeaders(),
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
@@ -340,46 +378,167 @@ const SalaryModal = ({ mode = "add", employeeId, defaultData = {}, onClose }) =>
 
       const result = await response.json();
 
-      if (!response.ok) throw new Error(result.message);
+      if (!response.ok) throw new Error(result.message || "Failed to save salary info");
 
-      setMessage(result.message);
+      setMessage(`✅ ${result.message || "Salary info saved successfully"}`);
       setTimeout(() => {
-        onClose(); // Close modal after success
-      }, 1000);
+        if (onSuccess) onSuccess();
+        onClose();
+      }, 700);
     } catch (err) {
-      setMessage(err.message);
+      setMessage(`❌ ${err.message}`);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center px-4">
-      <div className="bg-white max-w-2xl w-full rounded-xl shadow-xl p-6 relative max-h-[90vh] overflow-y-auto">
-        <button onClick={onClose} className="absolute top-3 right-4 text-lg text-gray-500 hover:text-red-600">✖</button>
+    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center px-4 animate-fade-in">
+      <div className="bg-white max-w-2xl w-full rounded-2xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto border border-slate-200">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition"
+        >
+          ✖
+        </button>
 
-        <h2 className="text-xl font-semibold mb-4 text-center">
-          {mode === "add" ? "Add Salary Info" : "Update Salary Info"}
+        <h2 className="text-xl font-bold mb-4 text-slate-800 text-center">
+          {mode === "add" ? "➕ Add Employee Salary Info" : "✏️ Update Salary Info"}
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-3 text-sm">
-          <div className="grid grid-cols-2 gap-3">
-            <input type="text" name="employee_id" value={formData.employee_id} onChange={handleChange} placeholder="Employee ID" disabled={mode === "update" || mode==="add"} className="border p-2 rounded" />
-            <input type="text" name="employee_name" value={formData.employee_name} onChange={handleChange} placeholder="Employee Name" className="border p-2 rounded" />
-            <input type="number" name="base_salary" value={formData.base_salary} onChange={handleChange} placeholder="Base Salary" className="border p-2 rounded" />
-            <input type="number" name="hra" value={formData.hra} onChange={handleChange} placeholder="HRA" className="border p-2 rounded" />
-            <input type="number" name="bonus" value={formData.bonus} onChange={handleChange} placeholder="Bonus" className="border p-2 rounded" />
-            <input type="number" name="tax_percent" value={formData.tax_percent} onChange={handleChange} placeholder="Tax %" className="border p-2 rounded" />
-            <input type="number" name="pf_percent" value={formData.pf_percent} onChange={handleChange} placeholder="PF %" className="border p-2 rounded" />
-            <input type="date" name="joining_date" value={formData.joining_date} onChange={handleChange} placeholder="Joining Date" className="border p-2 rounded" />
-            <input type="text" name="updated_by" value={formData.updated_by} onChange={handleChange} placeholder="updated_by" disabled={mode === "update" || mode==="add"} className="border p-2 rounded" />
-            
+        <form onSubmit={handleSubmit} className="space-y-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                Employee ID
+              </label>
+              <input
+                type="text"
+                name="employee_id"
+                value={formData.employee_id}
+                disabled
+                className="w-full border border-slate-200 bg-slate-100 p-2.5 rounded-lg text-slate-700 font-semibold"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                Employee Full Name
+              </label>
+              <input
+                type="text"
+                name="employee_name"
+                value={formData.employee_name}
+                onChange={handleChange}
+                placeholder="Full Name"
+                required
+                className="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                Base Monthly Salary (₹)
+              </label>
+              <input
+                type="number"
+                name="base_salary"
+                value={formData.base_salary}
+                onChange={handleChange}
+                placeholder="e.g. 75000"
+                required
+                className="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-bold"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                HRA Allowance (₹)
+              </label>
+              <input
+                type="number"
+                name="hra"
+                value={formData.hra}
+                onChange={handleChange}
+                placeholder="e.g. 30000"
+                className="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                Bonus / Incentives (₹)
+              </label>
+              <input
+                type="number"
+                name="bonus"
+                value={formData.bonus}
+                onChange={handleChange}
+                placeholder="Bonus"
+                className="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                Tax Deduction (%)
+              </label>
+              <input
+                type="number"
+                name="tax_percent"
+                value={formData.tax_percent}
+                onChange={handleChange}
+                placeholder="e.g. 10"
+                className="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                PF Deduction (%)
+              </label>
+              <input
+                type="number"
+                name="pf_percent"
+                value={formData.pf_percent}
+                onChange={handleChange}
+                placeholder="e.g. 12"
+                className="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase mb-1">
+                Joining Date
+              </label>
+              <input
+                type="date"
+                name="joining_date"
+                value={formData.joining_date}
+                onChange={handleChange}
+                className="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
           </div>
 
-          <button type="submit" className="w-full mt-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-            {mode === "add" ? "Add Info" : "Update Info"}
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-md disabled:opacity-50"
+          >
+            {submitting ? "Saving..." : mode === "add" ? "Save Salary Configuration" : "Update Salary Details"}
           </button>
         </form>
 
-        {message && <p className="text-center text-sm mt-3 text-green-600">{message}</p>}
+        {message && (
+          <p
+            className={`text-center text-sm mt-3 font-semibold ${
+              message.startsWith("✅") ? "text-emerald-600" : "text-rose-600"
+            }`}
+          >
+            {message}
+          </p>
+        )}
       </div>
     </div>
   );

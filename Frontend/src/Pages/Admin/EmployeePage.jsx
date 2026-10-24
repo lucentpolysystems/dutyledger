@@ -5,7 +5,9 @@ import "chart.js/auto";
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import {cacheUser} from '../../Redux/Slice'
-import jsPDF from 'jspdf'
+import jsPDF from 'jspdf';
+import { registerNotoSans } from '../NotoSansVariable.react';
+import { downloadSalarySlipPDF } from '../../utils/salarySlipPdf';
 import {
   ChevronDown,
   ChevronUp,
@@ -15,8 +17,7 @@ import {
   Gift,
   Minus,
 } from "lucide-react";
-import { Transition } from "@headlessui/react";
-import { apiUrl } from "../../utils/api";
+import { apiUrl, authHeaders } from "../../utils/api";
 import {
   ResponsiveContainer,
   BarChart,
@@ -102,7 +103,9 @@ const FetchEmployee= async()=>{
   try{
   
     
-    const response= await fetch(apiUrl(`/api/users/${id}`));
+    const response = await fetch(apiUrl(`/api/users/${id}`), {
+      headers: authHeaders(),
+    });
     
       if(!response.ok){
             throw new Error("Failed to fetch employees");
@@ -127,10 +130,16 @@ console.log(employee)
  <div className="bg-white w-full lg:w-1/5 rounded-2xl shadow-md p-6 text-sm text-gray-700 space-y-6">
   {/* Profile Header */}
   <div className="flex flex-col items-center text-center">
-      <img src="https://i.pravatar.cc/100?img=56" alt="Employee" className="w-24 h-24 rounded-full mb-4 shadow" />
-      <h3 className="text-lg font-semibold">{employee.username}</h3>
-      <p className="text-sm text-gray-500">{employee.designation}</p>
+    <div className="w-24 h-24 rounded-full mb-4 bg-slate-100 border-2 border-slate-200 flex items-center justify-center text-slate-700 font-extrabold text-3xl shadow-inner select-none">
+      {employee?.username ? employee.username.charAt(0).toUpperCase() : (
+        <svg className="w-12 h-12 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+        </svg>
+      )}
     </div>
+    <h3 className="text-lg font-semibold text-slate-800">{employee.username}</h3>
+    <p className="text-sm text-slate-500">{employee.designation || employee.role || "Employee"}</p>
+  </div>
 
   {/* Info Section */}
   <div>
@@ -200,15 +209,7 @@ console.log(employee)
         </div>
       </div>
 
-      <div className="flex items-start gap-3">
-        <FaGlobe className="text-gray-500 mt-1" />
-        <div>
-          <p className="text-xs text-gray-500">Website</p>
-          <a href="https://bit.ly/3uOJF79" className="text-sm text-blue-600 underline">
-            https://bit.ly/3uOJF79
-          </a>
-        </div>
-      </div>
+     
     </div>
   </div>
 </div>
@@ -310,9 +311,7 @@ useEffect(() => {
     try {
       const res = await fetch(apiUrl("/api/Generate"), {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: authHeaders(),
         body: JSON.stringify({
           month: `${selectedYear}-${selectedMonth}`,
           user_id,
@@ -347,36 +346,8 @@ console.log("recieve data is, in data variable",data)
   const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
 
   const downloadPDF = (item) => {
-  const doc = new jsPDF();
-
-  doc.setFontSize(16);
-  doc.text(`Salary Slip ${item.month}`, 80, 15);
-
-  doc.setFontSize(12);
-  doc.text(`Employee ID: ${item.employee_id}`, 10, 30);
-  doc.text(`Employee Name: ${item.employee_name}`, 10, 40);
-  doc.text(`Month: ${item.month}`, 10, 50);
-  doc.text(`Generated On: ${item.generated_on}`, 10, 60);
-
-  doc.text(`Basic Salary: ₹${item.basic_salary}`, 10, 80);
-  doc.text(`Gross Salary: ₹${item.salary_breakdown.gross_salary}`, 10, 90);
-  doc.text(`Net Salary: ₹${Number(item.salary_breakdown.net_salary).toFixed(2)}`, 10, 100);
-
-  doc.text(`\nDeductions:`, 10, 120);
-  doc.text(`• Tax: ₹${item.deductions.tax_amount}`, 10, 130);
-  doc.text(`• PF: ₹${item.deductions.pf_amount}`, 10, 140);
-  doc.text(`• Leave Deduction: ₹${Number(item.deductions.leave_deduction).toFixed(2)}`, 10, 150);
-  doc.text(`• Total Deduction: ₹${Number(item.deductions.total_deduction).toFixed(2)}`, 10, 160);
-
-  doc.text(`\nAttendance Summary:`, 10, 180);
-  doc.text(`• Total Working Days: ${item.attendance_summary.total_working_days}`, 10, 190);
-  doc.text(`• Present Days: ${item.attendance_summary.present_days}`, 10, 200);
-  doc.text(`• Absent Days: ${item.attendance_summary.absent_days}`, 10, 210);
-  doc.text(`• Paid Leaves: ${item.attendance_summary.paid_leave_allowance}`, 10, 220);
-  doc.text(`• Unpaid Leave Days: ${item.attendance_summary.unpaid_leave_days}`, 10, 230);
-
-  doc.save(`SalarySlip-${item.month}.pdf`);
-};
+    downloadSalarySlipPDF(item, employee);
+  };
 
   return (
     <div className="min-h-screen flex flex-col ">
@@ -524,7 +495,9 @@ console.log("recieve data is, in data variable",data)
 };
 
 const Attendance=()=>{
-  const [selectedMonth, setSelectedMonth] = useState('2025-06');
+  const now = new Date();
+  const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const [selectedMonth, setSelectedMonth] = useState(currentMonthStr);
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(false);
   const {id}=useParams()
@@ -576,9 +549,12 @@ const Attendance=()=>{
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
               >
-                <option value="2025-06">June 2025</option>
-                <option value="2025-05">May 2025</option>
-                <option value="2025-04">April 2025</option>
+                <option value="2026-10">October 2026</option>
+                <option value="2026-09">September 2026</option>
+                <option value="2026-08">August 2026</option>
+                <option value="2026-07">July 2026</option>
+                <option value="2026-06">June 2026</option>
+                <option value="2026-05">May 2026</option>
               </select>
             </div>
           </div>

@@ -20,6 +20,7 @@ import PayrollPage from "../Pages/Admin/PayrollPage";
 import Hrprofile from "../Pages/Admin/HrProfile";
 import Query from "../Pages/Admin/Query";
 import Announcements from "../Pages/Admin/Announcements";
+import RbacManagement from "../Pages/Admin/RbacManagement";
 
 // Employee Pages
 import Dashboard from "../Pages/Employee/EmployeeHome";
@@ -35,7 +36,7 @@ import Add from "../Pages/Add";
 
 //Not Found Page
 import NotFound from '../Components/NotFound'
-// import SettingsPage from "../Pages/Employee/SettingsPage";
+import SettingsPage from "../Pages/Employee/SettingsPage";
 import Contect from "../Pages/Employee/Contect";
 
 const AppRoutes = () => {
@@ -59,11 +60,12 @@ const AppRoutes = () => {
           <Route path="emprofile/:id" element={<Emprofile />} />
           <Route path="emchat" element={<Chatbot />} />
           <Route path="emcontect" element={<Contect />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
       )}
 
-      {/* HR Routes */}
-      {isAuthenticated && role === "hr" && (
+      {/* HR, Admin, Super Admin, Manager, Team Leader Routes */}
+      {isAuthenticated && (role === "hr" || role === "admin" || role === "super_admin" || role === "manager" || role === "team_leader") && (
         <Route path="/" element={<HrLayoutDashboard />}>
           <Route path="hrhome" element={<HRDashboard />} />
           <Route path="hremployees" element={<Employees />} />
@@ -75,6 +77,9 @@ const AppRoutes = () => {
           <Route path="hrprofile/:id" element={<Hrprofile />} />
           <Route path="hrquery" element={<Query />} />
           <Route path="hrannouncements" element={<Announcements />} />
+          <Route path="admin/rbac" element={<RbacManagement />} />
+          <Route path="rbac" element={<RbacManagement />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
       )}
       <Route path="/:id/set-password" element={<SetPassword />} />

@@ -17,10 +17,19 @@ import { apiUrl } from "../../utils/api";
 
 
 
+import dayjs from "dayjs";
+import { LogIn, LogOut, Clock as ClockIcon } from "lucide-react";
+
 const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userId, setUserId] = useState("");
   const [status, setStatus] = useState(null);
+  const [todayDetails, setTodayDetails] = useState({
+    in_time: null,
+    out_time: null,
+    work_duration: null,
+    status: "Absent",
+  });
   const [announcements, setAnnouncements] = useState([]);
   const [announcementsLoading, setAnnouncementsLoading] = useState(true);
   const dispatch = useDispatch();
@@ -42,7 +51,7 @@ const Dashboard = () => {
     }
   }, [user]);
 
-  // ✅ Fetch status when `id` is set
+  // ✅ Fetch status and in/out times when `id` is set
   useEffect(() => {
     if (!userId) return;
 
@@ -50,10 +59,16 @@ const Dashboard = () => {
       try {
         const res = await axios.get(apiUrl(`/api/attendance/${userId}`));
         console.log("id sent to api is ", userId);
-        setStatus(res.data.status);
-        dispatch(setAttendanceStatus(res.data.status));
-        console.log("Attendance status updated in Redux:", res.data.status);
-        console.log("Today's attendance status:", res.data.status);
+        const data = res.data || {};
+        setStatus(data.status);
+        setTodayDetails({
+          in_time: data.in_time || null,
+          out_time: data.out_time || null,
+          work_duration: data.work_duration || null,
+          status: data.status || "Absent",
+        });
+        dispatch(setAttendanceStatus(data.status));
+        console.log("Attendance status updated in Redux:", data.status);
       } catch (err) {
         console.error("Error fetching today's attendance", err);
       }
@@ -155,10 +170,54 @@ const Dashboard = () => {
         </div>
 
 
-        {/* Welcome Message */}
-        <div className="text-sm text-gray-700 bg-white p-4 rounded-md shadow">
-          <span className="font-medium text-base">Good to see you, {user?.username}👋</span>
-          <p className="mt-1 text-sm">You came 15 minutes early today.</p>
+        {/* Welcome Message & Today's Shift Status */}
+        <div className="bg-white p-5 rounded-xl shadow-xs border border-gray-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-lg text-gray-900">Good to see you, {user?.username} 👋</span>
+              <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                ID: {userId}
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 mt-1 flex items-center gap-1.5 font-medium">
+              <Calendar className="w-3.5 h-3.5 text-gray-400" />
+              Today is {dayjs().format("dddd, D MMMM YYYY")}
+            </p>
+          </div>
+
+          {/* Today's Punch Summary */}
+          <div className="flex flex-wrap items-center gap-3 text-xs bg-gray-50 p-2.5 rounded-lg border border-gray-200">
+            <div className="flex items-center gap-1.5 font-medium">
+              <LogIn className="w-4 h-4 text-emerald-600" />
+              <span className="text-gray-500">In:</span>
+              <span className="font-bold font-mono text-gray-800">{todayDetails.in_time || "Pending"}</span>
+            </div>
+
+            <span className="text-gray-300">•</span>
+
+            <div className="flex items-center gap-1.5 font-medium">
+              <LogOut className="w-4 h-4 text-indigo-600" />
+              <span className="text-gray-500">Out:</span>
+              <span className="font-bold font-mono text-gray-800">{todayDetails.out_time || (todayDetails.in_time ? "Active" : "Pending")}</span>
+            </div>
+
+            {todayDetails.work_duration && (
+              <>
+                <span className="text-gray-300">•</span>
+                <div className="flex items-center gap-1.5 font-medium">
+                  <ClockIcon className="w-3.5 h-3.5 text-amber-600" />
+                  <span className="font-bold text-gray-800">{todayDetails.work_duration}</span>
+                </div>
+              </>
+            )}
+
+            <button
+              onClick={() => navigate("/emattendance")}
+              className="ml-2 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-bold transition shadow-xs cursor-pointer"
+            >
+              {todayDetails.in_time ? (todayDetails.out_time ? "View Attendance" : "Punch OUT") : "Punch IN"}
+            </button>
+          </div>
         </div>
 
         {/* Stats */}

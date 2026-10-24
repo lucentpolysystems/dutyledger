@@ -24,13 +24,29 @@ const login = async (req, res) => {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
 
-  // ✅ Generate JWT token
+  const userRoles = Array.isArray(user.roles) && user.roles.length > 0
+    ? user.roles
+    : (user.role || "").toLowerCase() === "hr"
+      ? ["ROLE_SUPER_ADMIN", "ROLE_HR_ADMIN"]
+      : ["ROLE_EMPLOYEE"];
+
+  const userPermissions = Array.isArray(user.cached_permissions)
+    ? user.cached_permissions
+    : [];
+
+  // ✅ Generate JWT token with RBAC roles
   const token = jwt.sign(
     {
       userId: user._id.toString(),
+      user_id: user.user_id,
       username: user.username,
       email: user.email,
       role: user.role,
+      roles: userRoles,
+      department: user.department || "General",
+      reporting_to: user.reporting_to || null,
+      designation: user.designation || "Staff",
+      pv: user.permission_version || 1,
     },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN }
@@ -43,7 +59,12 @@ const login = async (req, res) => {
       id: user.user_id,
       username: user.username,
       email: user.email,
-      role: user.role.toLowerCase(),
+      role: (user.role || "").toLowerCase(),
+      roles: userRoles,
+      department: user.department || "General",
+      reporting_to: user.reporting_to || null,
+      designation: user.designation || "Staff",
+      permissions: userPermissions,
     },
   });
 };

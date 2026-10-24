@@ -1,6 +1,6 @@
 import {React,useState,useEffect} from "react";
 import { useNavigate } from "react-router-dom";
-import { apiUrl } from "../../utils/api";
+import { apiUrl, authHeaders } from "../../utils/api";
 
 const PayrollSystem = () => {
 const [employees, setEmployees] = useState([]);
@@ -10,7 +10,9 @@ const [employees, setEmployees] = useState([]);
 useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch(apiUrl("/api/all"));
+        const response = await fetch(apiUrl("/api/all"), {
+          headers: authHeaders(),
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch employees");
         }

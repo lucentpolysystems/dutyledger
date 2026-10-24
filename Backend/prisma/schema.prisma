@@ -1,0 +1,167 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                  String           @id @default(uuid())
+  userId              String           @unique @map("user_id")
+  username            String
+  email               String           @unique
+  password            String?
+  role                String           @default("Employee")
+  roles               String[]         @default(["ROLE_EMPLOYEE"])
+  directPermissions   String[]         @default([]) @map("direct_permissions")
+  cachedPermissions   String[]         @default([]) @map("cached_permissions")
+  permissionVersion   Int              @default(1) @map("permission_version")
+  department          String?          @default("General")
+  designation         String?          @default("Staff")
+  reportingTo         String?          @map("reporting_to")
+  joiningDate         String?          @map("joigningDate")
+  gender              String?
+  address             String?
+  bankAccount         String?
+  ifsc                String?          @map("IFSC")
+  mobile              String?
+  salary              Float            @default(0)
+  employmentType      String?          @default("Full-time")
+  attendanceType      String?          @default("Office")
+  emergencyContact     String?
+  emergencyContactName String?          @map("emergencyContactname")
+  profileImage        String?
+  passwordSetToken    String?
+  tokenExpiry         DateTime?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  attendances         Attendance[]
+  salaryInfo          SalaryInfo?
+  payrollRecords      PayrollRecord[]
+  contactMessages     ContactHR[]
+
+  @@map("users")
+}
+
+model Attendance {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  user         User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  date         String    // YYYY-MM-DD
+  inTime       String?   @map("in_time")
+  outTime      String?   @map("out_time")
+  totalHours   Float?    @map("total_hours")
+  workDuration String?   @map("work_duration")
+  status       String    @default("Present")
+  location     String?
+  punchType    String?   @map("punchType")
+  time         DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([userId, date])
+  @@map("attendance")
+}
+
+model SalaryInfo {
+  id                String   @id @default(uuid())
+  employeeId        String   @unique @map("employee_id")
+  user              User     @relation(fields: [employeeId], references: [userId], onDelete: Cascade)
+  employeeName      String   @map("employee_name")
+  baseSalary        Float    @map("base_salary")
+  hra               Float
+  bonus             Float    @default(0)
+  taxPercent        Float    @default(10) @map("tax_percent")
+  pfPercent         Float    @default(12) @map("pf_percent")
+  paidLeavesAllowed Int      @default(2) @map("paid_leaves_allowed")
+  joiningDate       String?  @map("joining_date")
+  lastUpdate        DateTime @default(now()) @map("last_update")
+  updatedBy         String   @default("System") @map("updated_by")
+
+  @@map("salary_info")
+}
+
+model PayrollRecord {
+  id             String    @id @default(uuid())
+  employeeId     String    @map("employee_id")
+  user           User      @relation(fields: [employeeId], references: [userId], onDelete: Cascade)
+  month          Int
+  year           Int
+  netSalary      Float     @map("net_salary")
+  totalDeductions Float    @default(0) @map("total_deductions")
+  status         String    @default("Pending")
+  paymentDate    DateTime? @map("payment_date")
+  createdAt      DateTime  @default(now())
+
+  @@map("payroll_records")
+}
+
+model Holiday {
+  id        String   @id @default(uuid())
+  date      String
+  reason    String
+  createdAt DateTime @default(now())
+
+  @@map("holidays")
+}
+
+model Announcement {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  startDate   String
+  endDate     String
+  createdBy   String   @map("created_by")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("announcements")
+}
+
+model ContactHR {
+  id           String   @id @default(uuid())
+  employeeId   String   @map("employee_id")
+  user         User     @relation(fields: [employeeId], references: [userId], onDelete: Cascade)
+  employeeName String?  @map("employee_name")
+  subject      String
+  category     String   @default("General Inquiry")
+  priority     String   @default("Normal")
+  message      String
+  attachment   String?
+  status       String   @default("Pending")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("contact_hr")
+}
+
+model Role {
+  id           String   @id @default(uuid())
+  roleId       String   @unique @map("role_id")
+  name         String
+  description  String?  @default("")
+  isSystemRole Boolean  @default(false) @map("is_system_role")
+  inheritsFrom String[] @default([]) @map("inherits_from")
+  permissions  String[] @default([])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("roles")
+}
+
+model AuditEvent {
+  id        String   @id @default(uuid())
+  actorId   String?  @map("actor_id")
+  actorName String?  @map("actor_name")
+  action    String
+  resource  String
+  targetId  String?  @map("target_id")
+  details   Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@map("audit_events")
+}

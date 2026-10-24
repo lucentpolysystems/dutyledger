@@ -48,15 +48,17 @@ const Sidebar = () => {
       >
         {/* Profile Section */}
         <div className="p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <img
-              src="https://i.pravatar.cc/100"
-              alt="Profile"
-              className="w-14 h-14 rounded-full border"
-            />
-            <div>
-              <h2 className="text-sm font-semibold">{user?.username}</h2>
-              <p className="text-xs text-gray-500">{user?.role}</p>
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+            <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 font-bold text-base shadow-inner shrink-0 select-none">
+              {user?.username ? user.username.charAt(0).toUpperCase() : (
+                <User size={22} className="text-slate-500" />
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-sm font-bold text-slate-800 truncate">{user?.username || "Employee"}</h2>
+              <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 mt-0.5">
+                {user?.role || "Employee"}
+              </span>
             </div>
           </div>
 

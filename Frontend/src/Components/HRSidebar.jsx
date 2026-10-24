@@ -11,6 +11,7 @@ import {
   X,
   UserRoundPen,
   Megaphone,
+  ShieldCheck,
 } from "lucide-react";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -44,46 +45,114 @@ const Sidebar = () => {
       >
         {/* Profile Section */}
         <div className="p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <img
-              src="https://i.pravatar.cc/100"
-              alt="Profile"
-              className="w-14 h-14 rounded-full border"
-            />
-            <div>
-              <h2 className="text-sm font-semibold">{user?.username}</h2>
-              <p className="text-xs text-gray-500">{user?.role}</p>
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+            <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 font-bold text-base shadow-inner shrink-0 select-none">
+              {user?.username ? user.username.charAt(0).toUpperCase() : (
+                <User size={22} className="text-slate-500" />
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-sm font-bold text-slate-800 truncate">{user?.username || "Admin User"}</h2>
+              <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-sky-100 text-sky-800 mt-0.5">
+                {user?.role || "HR"}
+              </span>
             </div>
           </div>
 
           {/* Navigation Menu */}
-          <nav className="space-y-3">
-            {[
-              { label: 'Dashboard', icon: <LayoutDashboard size={18} />, path: '/hrhome' },
-              { label: 'Employees', icon: <Users size={18} />, path: '/hremployees' },
-              { label: 'Add Employee', icon: <UserPlus size={18} />, path: '/hraddemployee' },
-              { label: 'Payroll System', icon: <Wallet size={18} />, path: '/hrpayrollsystem' },
-              { label: 'Calendar', icon: <Calendar size={18} />, path: '/hrcalendar' },
-              { label: 'Profile', icon: <User size={18} />, path: `/hrprofile/${user?.id}` },
-              { label: 'Settings', icon: <Settings size={18} />, path: '/settings' },
-              { label: 'Employee Queries', icon: <UserRoundPen  size={18} />, path: '/hrquery' },
-              { label: 'Announcements', icon: <Megaphone size={18} />, path: '/hrannouncements' },
-            ].map(({ label, icon, path }) => (
-              <button
-                key={path}
-                onClick={() => {
-                  navigate(path);
-                  setIsOpen(false); // Close sidebar on mobile after click
-                }}
-                className={`flex items-center gap-3 p-2 rounded-lg w-full text-left transition ${
-                  isActive(path)
-                    ? 'bg-indigo-100 text-indigo-600 font-semibold'
-                    : 'hover:bg-gray-100'
-                }`}
-              >
-                {icon} <span>{label}</span>
-              </button>
-            ))}
+          <nav className="space-y-1.5">
+            {(() => {
+              const userRoles = user?.roles || [];
+              const perms = new Set(user?.permissions || []);
+              const isSuper = userRoles.includes("ROLE_SUPER_ADMIN");
+
+              const menuItems = [
+                {
+                  label: 'Dashboard',
+                  icon: <LayoutDashboard size={18} />,
+                  path: '/hrhome',
+                  visible: true,
+                },
+                {
+                  label: 'Access Control (RBAC)',
+                  icon: <ShieldCheck size={18} className="text-indigo-600" />,
+                  path: '/admin/rbac',
+                  visible: isSuper || perms.has('rbac:roles:manage'),
+                  badge: 'Admin Only',
+                },
+                {
+                  label: 'Employees Directory',
+                  icon: <Users size={18} />,
+                  path: '/hremployees',
+                  visible: isSuper || perms.has('employees:read:all') || perms.has('employees:read:dept') || perms.has('employees:read:team'),
+                },
+                {
+                  label: 'Add Employee',
+                  icon: <UserPlus size={18} />,
+                  path: '/hraddemployee',
+                  visible: isSuper || perms.has('employees:create'),
+                  badge: 'HR',
+                },
+                {
+                  label: 'Payroll System',
+                  icon: <Wallet size={18} />,
+                  path: '/hrpayrollsystem',
+                  visible: isSuper || perms.has('payroll:read:all') || perms.has('payroll:structure:manage'),
+                  badge: 'HR',
+                },
+                {
+                  label: 'Company Calendar',
+                  icon: <Calendar size={18} />,
+                  path: '/hrcalendar',
+                  visible: isSuper || perms.has('attendance:read:all') || perms.has('attendance:read:dept'),
+                },
+                {
+                  label: 'Employee Queries',
+                  icon: <UserRoundPen size={18} />,
+                  path: '/hrquery',
+                  visible: isSuper || perms.has('queries:resolve') || perms.has('queries:read:team'),
+                },
+                {
+                  label: 'Announcements',
+                  icon: <Megaphone size={18} />,
+                  path: '/hrannouncements',
+                  visible: isSuper || perms.has('announcements:publish') || perms.has('announcements:read'),
+                },
+                {
+                  label: 'System Settings',
+                  icon: <Settings size={18} />,
+                  path: '/settings',
+                  visible: true,
+                },
+              ];
+
+              return menuItems
+                .filter((item) => item.visible)
+                .map(({ label, icon, path, badge }) => (
+                  <button
+                    key={path}
+                    onClick={() => {
+                      navigate(path);
+                      setIsOpen(false);
+                    }}
+                    className={`flex items-center justify-between p-2.5 rounded-xl w-full text-left transition ${
+                      isActive(path)
+                        ? 'bg-indigo-50 text-indigo-700 font-bold border border-indigo-200/60 shadow-sm'
+                        : 'text-slate-600 hover:bg-slate-100 font-medium'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {icon}
+                      <span className="text-xs">{label}</span>
+                    </div>
+                    {badge && (
+                      <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">
+                        {badge}
+                      </span>
+                    )}
+                  </button>
+                ));
+            })()}
           </nav>
         </div>
 

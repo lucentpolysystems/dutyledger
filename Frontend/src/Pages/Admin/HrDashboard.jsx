@@ -259,30 +259,32 @@ console.log("📊 Attendance data:", employees[0]?.username);
                       <th className="p-2">Date</th>
                       <th className="p-2">Employee</th>
                       <th className="p-2">User ID</th>
+                      <th className="p-2">Punch IN</th>
+                      <th className="p-2">Punch OUT</th>
+                      <th className="p-2">Shift Duration</th>
                       <th className="p-2">Status</th>
-                      <th className="p-2">Time</th>
                     </tr>
                   </thead>
                   <tbody>
                     {employees.map((emp, idx) => (
                       <tr key={idx} className="border-b hover:bg-gray-50">
-                        <td className="p-2">{new Date(emp.date).toLocaleDateString()}</td>
-                        <td className="p-2">{emp.username}</td>
-                        <td className="p-2">{emp.user_id}</td>
+                        <td className="p-2 font-medium text-gray-700">{emp.date}</td>
+                        <td className="p-2 font-semibold text-gray-800">{emp.username}</td>
+                        <td className="p-2 font-mono text-xs text-gray-500">{emp.user_id}</td>
+                        <td className="p-2 font-mono text-emerald-600 font-semibold">
+                          {emp.in_time || "--"}
+                        </td>
+                        <td className="p-2 font-mono text-indigo-600 font-semibold">
+                          {emp.out_time || (emp.in_time ? "Working..." : "--")}
+                        </td>
+                        <td className="p-2 font-mono text-xs text-gray-600">
+                          {emp.work_duration || (emp.total_hours ? `${emp.total_hours} hrs` : "--")}
+                        </td>
                         <td className="p-2">
-                          <span className={`px-2 py-1 text-xs rounded ${getStatusColor(emp.status)}`}>
+                          <span className={`px-2 py-1 text-xs rounded font-bold ${getStatusColor(emp.status)}`}>
                             {emp.status}
                           </span>
                         </td>
-             <td className="p-2">
-  {new Date(emp.time).toLocaleTimeString("en-US", {
-    timeZone: "UTC",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  })}
-</td>
-
                       </tr>
                     ))}
                   </tbody>

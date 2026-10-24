@@ -2,7 +2,9 @@ import {React,useState,useEffect} from "react";
 import Header from "../../Components/Header"; // Adjust if needed
 import Sidebar from "../../Components/HRSidebar"; // Adjust if needed
 import { useNavigate } from "react-router-dom";
-import { apiUrl } from "../../utils/api";
+import { apiUrl, authHeaders } from "../../utils/api";
+import { UserPlus } from "lucide-react";
+import Can from "../../Components/Common/Can";
 
 const Employees = () => {
   // const employees = [
@@ -50,7 +52,9 @@ const Employees = () => {
 useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch(apiUrl("/api/all"));
+        const response = await fetch(apiUrl("/api/all"), {
+          headers: authHeaders(),
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch employees");
         }
@@ -71,7 +75,17 @@ useEffect(() => {
   return (
     <div className="min-h-screen flex flex-col">
         <div className="flex-1 p-6 bg-gray-50">
-          <h2 className="text-2xl font-semibold mb-4">Employees List</h2>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <h2 className="text-2xl font-semibold">Employees List</h2>
+            <Can perform="employee:create">
+              <button
+                onClick={() => navigate("/hraddemployee")}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition shadow-sm w-fit"
+              >
+                <UserPlus size={16} /> Add Employee
+              </button>
+            </Can>
+          </div>
 
           {/* Search Bar */}
           <div className="mb-4">

@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import {cacheUser} from '../../Redux/Slice'
 import { FaDownload, FaEnvelope, FaPhone, FaGlobe, FaCalendarAlt,FaRupeeSign,FaRegClock } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
-import { apiUrl } from "../../utils/api";
+import { apiUrl, authHeaders } from "../../utils/api";
 
 const Hrprofile = () => {
   const [tab, setTab] = useState("Personal Info");
@@ -58,7 +58,9 @@ const FetchEmployee= async()=>{
   try{
   
     
-    const response= await fetch(apiUrl(`/api/users/${id}`));
+    const response = await fetch(apiUrl(`/api/users/${id}`), {
+      headers: authHeaders(),
+    });
     
       if(!response.ok){
             throw new Error("Failed to fetch employees");
@@ -83,10 +85,16 @@ console.log(employee)
  <div className="bg-white w-full lg:w-1/5 rounded-2xl shadow-md p-6 text-sm text-gray-700 space-y-6">
   {/* Profile Header */}
   <div className="flex flex-col items-center text-center">
-      <img src="https://i.pravatar.cc/100?img=56" alt="Employee" className="w-24 h-24 rounded-full mb-4 shadow" />
-      <h3 className="text-lg font-semibold">{employee.username}</h3>
-      <p className="text-sm text-gray-500">UX Designer</p>
+    <div className="w-24 h-24 rounded-full mb-4 bg-slate-100 border-2 border-slate-200 flex items-center justify-center text-slate-700 font-extrabold text-3xl shadow-inner select-none">
+      {employee?.username ? employee.username.charAt(0).toUpperCase() : (
+        <svg className="w-12 h-12 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+        </svg>
+      )}
     </div>
+    <h3 className="text-lg font-semibold text-slate-800">{employee.username}</h3>
+    <p className="text-sm text-slate-500">{employee.designation || employee.role || "HR Management"}</p>
+  </div>
 
   {/* Info Section */}
   <div>
@@ -156,15 +164,7 @@ console.log(employee)
         </div>
       </div>
 
-      <div className="flex items-start gap-3">
-        <FaGlobe className="text-gray-500 mt-1" />
-        <div>
-          <p className="text-xs text-gray-500">Website</p>
-          <a href="https://bit.ly/3uOJF79" className="text-sm text-blue-600 underline">
-            https://bit.ly/3uOJF79
-          </a>
-        </div>
-      </div>
+     
     </div>
   </div>
 </div>
@@ -303,7 +303,9 @@ function SalaryInfoTab() {
 
     const fetchSalaryInfo = async () => {
       try {
-        const response = await fetch(apiUrl(`/api/usersalaryinfo/${id}`));
+        const response = await fetch(apiUrl(`/api/usersalaryinfo/${id}`), {
+          headers: authHeaders(),
+        });
 
         if (!response.ok) {
           setMessage("Salary data is not found for this user. Please add the user info.");
@@ -362,8 +364,8 @@ function SalaryInfoTab() {
           <div>
             <h4 className="text-md font-semibold mb-2 text-indigo-600">🔄 Updates</h4>
             <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-              <p><span className="font-medium">Updated By:</span> {employee.updated_by}</p>
-               <p><span className="font-medium">Last Update:</span> {(employee.last_update).split("T")[0]}</p>
+              <p><span className="font-medium">Updated By:</span> {employee.updated_by || "System"}</p>
+              <p><span className="font-medium">Last Update:</span> {String(employee.last_update || "").split("T")[0] || "N/A"}</p>
             </div>
           </div>
         </>
@@ -419,10 +421,10 @@ const ProfileModal = ({ mode = "update", employeeId, defaultData = {}, onClose }
       const response = await fetch(url, {
         method,
         headers: {
+          ...authHeaders(),
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-        
       });
 
       const result = await response.json();

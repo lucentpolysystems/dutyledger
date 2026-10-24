@@ -1,55 +1,10 @@
-// import react from 'react';
-// import { useState } from 'react';
-
-// const Login =()=>{
-// const [id, setId] = useState('');
-// const [username, setUsername] = useState('');
-// const [password, setPassword] = useState('');
-//     return(
-//         <>
-//             <div className='flex flex-row  justify-between items-center h-screen '>
-//                 <div className='flex flex-col justify-center items-center w-2/5 h-full'>
-//                <div className='flex justify-start pl-3 pt-3 w-full'>
-//                  <img src="https://res.cloudinary.com/doqzxuxb1/image/upload/v1748249798/Attendance%20And%20Payroll%20Managment/eanj5h57izb4wsvgkzhc.png" alt="" />
-//                </div>
-//              <div className='w-4/5 h-full flex justify-center items-center'>
-//                 <div className='flex flex-col justify-center w-4/5'>
-//                     <h1 className='text-3xl font-bold'>Sign-in</h1>
-//                     <form className='flex flex-col mt-4 w-4/4'>
-//                         <input type="text" placeholder='id*' className='border border-gray-300 p-2 mb-2 rounded' name='id' value={id}   onChange={(e) => setId(e.target.value)} />
-
-//                         <input type="password" placeholder='Username*' className='border border-gray-300 p-2 mb-2 rounded' name='Username' value={username} onChange={(e)=>setUsername(e.target.value)} />
-
-//                         <input type="password" placeholder='Password*' className='border border-gray-300 p-2 mb-2 rounded' name='password' value={password} onChange={(e)=>setPassword(e.target.value)}/>
-
-//                         <button type="submit" className='bg-blue-500 text-white p-2 rounded'>Login</button>
-
-//                     </form>
-//                 </div>               
-//              </div>
-//              <span className='mb-5'>Terms and Condition • Privacy Policy</span>
-//                 </div>
-
-//               <div className=' bg-gray-100 h-full w-3/5 flex justify-center items-center'>
-//              <img src="https://res.cloudinary.com/doqzxuxb1/image/upload/v1748238957/Attendance%20And%20Payroll%20Managment/y45ltl4yfgxsksuetayk.png" alt="Login page" className='' />
-//           </div>
-//           <div>
-            
-//           </div>
-//             </div>
-
-
-//         </>
-//     )
-// };
-// export default Login;
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import { loginUser } from "../../Redux/Slice";
 import { toast, ToastContainer } from "react-toastify";
 import { apiUrl } from "../../utils/api";
+import { Lock, User, KeyRound, Sparkles, Clock, ShieldCheck, FileSpreadsheet, CheckCircle2 } from "lucide-react";
 import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
@@ -60,16 +15,27 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // ✅ CLEAR OLD TOKEN WHEN LOGIN PAGE LOADS
+  // Clear old token on page load
   useEffect(() => {
-    console.log("🧹 Clearing old token...");
-    localStorage.removeItem("token"); 
-    localStorage.removeItem("role"); 
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
   }, []);
+
+  const handleFillDemo = (roleType) => {
+    if (roleType === 'hr') {
+      setId('ADMIN001');
+      setUsername('Admin User');
+      setPassword('admin123');
+    } else {
+      setId('EMP001');
+      setUsername('John Doe');
+      setPassword('employee123');
+    }
+  };
 
   const handelLogin = async (e) => {
     e.preventDefault();
-    setLoading(true); 
+    setLoading(true);
     const userData = { username, password, id };
 
     try {
@@ -78,12 +44,11 @@ const Login = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
       });
-      console.log(apiUrl("/api/login"), userData);
 
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.message || "Login failed", {
+        toast.error(data.message || "Invalid credentials", {
           position: "bottom-right",
         });
         return;
@@ -91,121 +56,248 @@ const Login = () => {
 
       const role = (data?.user?.role || "").toLowerCase();
 
-      // ✅ Update Redux
+      // Update Redux
       dispatch(loginUser({ user: data.user, token: data.token }));
 
-      // ✅ Save new token to localStorage
+      // Save token to localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", role);
 
-      toast.success("Login successful!", {
+      toast.success(`Welcome ${data?.user?.username || 'back'}!`, {
         position: "bottom-right",
       });
 
-      // ✅ Navigate after login
+      // Navigate after login
       setTimeout(() => {
-        if (role === "employee") {
-          navigate("/emhome");
+        if (role === "admin" || role === "super_admin") {
+          navigate("/admin/rbac");
         } else if (role === "hr") {
           navigate("/hrhome");
+        } else if (role === "manager" || role === "team_leader") {
+          navigate("/hrhome");
+        } else {
+          navigate("/emhome");
         }
-      }, 1500); // wait for toast to show
+      }, 1200);
 
     } catch (error) {
       console.error("Error during login:", error);
-         toast.error("An error occurred while logging in. Please try again.", {
+      toast.error("An error occurred while logging in. Please check your connection.", {
         position: "bottom-right",
       });
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen">
-      {/* Left Side (Logo + Form + Footer) */}
-      <div className="flex flex-col w-full md:w-2/5 h-full">
-        {/* LOGO */}
-        <div className="order-1 md:order-1 flex justify-start pl-3 pt-3 w-full">
-          <img src="https://res.cloudinary.com/doqzxuxb1/image/upload/v1748249798/Attendance%20And%20Payroll%20Managment/eanj5h57izb4wsvgkzhc.png" alt="Logo" />
-        </div>
+    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 text-slate-800">
 
-        {/* IMAGE (on mobile, placed after logo) */}
-        <div className="order-2 md:hidden flex justify-center items-center">
-          <img src="https://res.cloudinary.com/doqzxuxb1/image/upload/v1748238957/Attendance%20And%20Payroll%20Managment/y45ltl4yfgxsksuetayk.png" alt="Login Image" />
-        </div>
+      {/* Left Column (Brand + Form) */}
+      <div className="flex flex-col justify-between w-full md:w-1/2 lg:w-5/12 p-6 sm:p-10 lg:p-12 bg-white shadow-xl z-10">
 
-        {/* FORM */}
-        <div className="order-3 md:order-2 flex justify-center items-center flex-1">
-          <div className="w-9/12 md:w-3/5">
-            <h1 className="text-3xl font-bold">Sign-in</h1>
-            <form className="flex flex-col mt-4" onSubmit={handelLogin}>
-              <input
-                type="text"
-                placeholder="id*"
-                className="border border-gray-300 p-2 mb-2 rounded w-full"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Username*"
-                className="border border-gray-300 p-2 mb-2 rounded w-full"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-              <input
-                type="password"
-                placeholder="Password*"
-                className="border border-gray-300 p-2 mb-2 rounded w-full"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-<button
-  type="submit"
-  className={`flex justify-center items-center gap-2 p-2 rounded text-white ${loading ? "bg-gray-400" : "bg-blue-500"}`}
-  disabled={loading} // ✅ disable while loading
->
-  {loading && (
-    <svg
-      className="animate-spin h-5 w-5 text-white"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      ></circle>
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-      ></path>
-    </svg>
-  )}
-  {loading ? "Logging in..." : "Login"}
-</button>
-            </form>
+        {/* Top Company Brand Bar */}
+        <div className="flex items-center gap-3.5">
+          <img
+            src="/logo.jpg"
+            alt="Lucent Polysystem Pvt. Ltd."
+            className="h-12 w-auto object-contain rounded-lg shadow-sm"
+          />
+          <div className="flex flex-col">
+            <span className="font-extrabold text-lg text-slate-900 leading-tight">
+              Lucent Polysystem
+            </span>
+            <span className="text-xs font-semibold text-sky-600 uppercase tracking-wider">
+              Pvt. Ltd.
+            </span>
           </div>
         </div>
 
-        {/* FOOTER */}
-        <div className="order-4 md:order-3 mb-8 text-center text-sm">
-          Terms and Conditions • Privacy Policy
+        {/* Center: Sign-In Form */}
+        <div className="my-8 max-w-md w-full mx-auto">
+          <div className="mb-6">
+            <span className="inline-block px-2.5 py-1 text-xs font-bold text-sky-700 bg-sky-50 border border-sky-200 rounded-md mb-2">
+              Corporate HR & Attendance Portal
+            </span>
+            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+              Sign In
+            </h1>
+            <p className="text-sm text-slate-500 mt-1">
+              Enter your employee ID and credentials to access your dashboard.
+            </p>
+          </div>
+
+          <form className="space-y-4" onSubmit={handelLogin}>
+
+            {/* User ID Field */}
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                Employee / User ID <span className="text-rose-500">*</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <KeyRound className="w-4 h-4" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="e.g. ADMIN001 or EMP001"
+                  required
+                  className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition"
+                  value={id}
+                  onChange={(e) => setId(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Username Field */}
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                Username <span className="text-rose-500">*</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <User className="w-4 h-4" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="e.g. Admin User or John Doe"
+                  required
+                  className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Password Field */}
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                Password <span className="text-rose-500">*</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <Lock className="w-4 h-4" />
+                </div>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  required
+                  className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-3 px-4 rounded-lg font-bold text-white text-sm shadow-md transition-all flex items-center justify-center gap-2 ${loading
+                  ? "bg-sky-400 cursor-not-allowed"
+                  : "bg-sky-600 hover:bg-sky-700 active:scale-[0.99]"
+                }`}
+            >
+              {loading && (
+                <svg
+                  className="animate-spin h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  />
+                </svg>
+              )}
+              {loading ? "Authenticating..." : "Sign In to Portal"}
+            </button>
+          </form>
+
+          {/* Quick Demo Pre-fill helper */}
+          <div className="mt-6 pt-5 border-t border-slate-200">
+            <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold mb-2.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Quick Demo Login:
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <button
+                type="button"
+                onClick={() => handleFillDemo('hr')}
+                className="p-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 font-semibold text-left transition flex flex-col"
+              >
+                <span className="font-bold text-sky-900">👑 HR Admin</span>
+                <span className="text-[10px] text-sky-600">ID: ADMIN001</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleFillDemo('employee')}
+                className="p-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-semibold text-left transition flex flex-col"
+              >
+                <span className="font-bold text-emerald-900">👤 Employee</span>
+                <span className="text-[10px] text-emerald-600">ID: EMP001</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center text-xs text-slate-400 pt-4 border-t border-slate-100">
+          © {new Date().getFullYear()} Lucent Polysystem Pvt. Ltd. • All Rights Reserved
         </div>
       </div>
 
-      {/* RIGHT SIDE IMAGE (desktop only) */}
-      <div className="hidden md:flex md:order-2 w-3/5 h-full justify-center items-center bg-gray-100">
-        <img src="https://res.cloudinary.com/doqzxuxb1/image/upload/v1748238957/Attendance%20And%20Payroll%20Managment/y45ltl4yfgxsksuetayk.png" alt="Login Image" />
+      {/* Right Column: Branded Corporate Presentation (Desktop) */}
+      <div className="hidden md:flex flex-1 flex-col justify-between p-12 lg:p-16 bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900 text-white relative overflow-hidden">
+
+        {/* Ambient Gradient Glows */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Top Tag */}
+        <div className="flex items-center justify-between">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-semibold text-sky-200">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            Lucent Enterprise Cloud
+          </div>
+          <span className="text-xs text-slate-400 font-mono">v2.4.0</span>
+        </div>
+
+        {/* Center Presentation Card */}
+        <div className="my-auto max-w-lg space-y-6">
+          <div className="inline-block p-4 rounded-2xl bg-white shadow-xl border border-white/20">
+            <img
+              src="/logo.jpg"
+              alt="Lucent Polysystem Pvt. Ltd."
+              className="h-16 w-auto object-contain"
+            />
+          </div>
+
+          <h2 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+            Lucent Polysystem <br />
+            <span className="text-sky-400">Pvt. Ltd.</span>
+          </h2>
+
+          <p className="text-slate-300 text-sm leading-relaxed">
+            Welcome to the centralized internal portal for Lucent Polysystem Pvt. Ltd. Manage attendance tracking, geofenced punch-ins, salary and payroll disbursements, leaves, and HR communications seamlessly in one place.
+          </p>
+
+
+        </div>
+
       </div>
 
-      {/* ✅ Toast Notifications */}
+      {/* Toast Notifications */}
       <ToastContainer />
     </div>
   );

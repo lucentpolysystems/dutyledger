@@ -135,12 +135,12 @@ const addUser = async (req, res) => {
     const setPasswordLink = `${process.env.FRONTEND_URL}/${id}/set-password?token=${token}`;
 
     await transporter.sendMail({
-      from: `"Payroll App" <${process.env.SMTP_EMAIL}>`,
+      from: `"Lucent Polysystem Pvt. Ltd." <${process.env.SMTP_EMAIL}>`,
       to: email,
-      subject: "Welcome to the Team – Set Your Password",
+      subject: "Welcome to Lucent Polysystem – Set Your Password",
       html: `
         <p>Hello <strong>${name}</strong>,</p>
-        <p>Your HR has created an account for you in the Payroll system.</p>
+        <p>Welcome to <strong>Lucent Polysystem Pvt. Ltd.</strong>! Your HR account has been created in the Attendance & Payroll system.</p>
         <p>Click the link below to set your password (valid for 1 hour):</p>
         <a href="${setPasswordLink}">${setPasswordLink}</a>
         <p>Please review your details below:</p>
@@ -162,7 +162,7 @@ const addUser = async (req, res) => {
         <br /><br />
         <p>If any of these details are incorrect, please contact the HR team at ${process.env.HR_EMAIL}</p>
         <p>Thank you!</p>
-        <p>Best regards,</p>
+        <p>Best regards,<br><strong>Lucent Polysystem Pvt. Ltd. HR Team</strong></p>
       `,
     });
 
@@ -177,33 +177,48 @@ const addUser = async (req, res) => {
   }
 };
 
-const alluser = async (req,res)=>{
+const alluser = async (req, res) => {
   const db = getDB();
-  try{
-    const users = await db.collection('users').find().project({ password: 0 }).toArray();
-    if (!users || users.length === 0) {
-      return res.status(404).json({ message: 'No users found' });
+  try {
+    let query = {};
+
+    // Data-level scoping if user has department or team level permissions
+    if (req.user) {
+      const perms = new Set(req.user.permissions || req.user.cached_permissions || []);
+      const hasFullAccess = perms.has("employees:read:all") || perms.has("users:read:all") || (req.user.roles || []).includes("ROLE_SUPER_ADMIN");
+
+      if (!hasFullAccess) {
+        if (perms.has("employees:read:dept") && req.user.department) {
+          query.department = req.user.department;
+        } else if (perms.has("employees:read:team") && req.user.user_id) {
+          query.$or = [{ reporting_to: req.user.user_id }, { user_id: req.user.user_id }];
+        }
+      }
     }
-    res.status(200).json({message:"User fetched sucessfully", users});
-    
 
-  }catch(error){
-    console.error('Error fetching users:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    const users = await db.collection("users").find(query).project({ password: 0 }).toArray();
+    res.status(200).json({ message: "User fetched successfully", users: users || [] });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
 
-const userByitsId = async (req,res)=>{
-  const db=getDB();
+const userByitsId = async (req, res) => {
+  const db = getDB();
+  const { userid } = req.params;
+  try {
+    const { ObjectId } = require('mongodb');
+    let query = { user_id: userid };
+    if (ObjectId.isValid(userid) && userid.length === 24) {
+      query = { $or: [{ user_id: userid }, { _id: new ObjectId(userid) }] };
+    }
 
-  const {userid}=req.params;
-  console.log("id recieved is",req.params);
-  try{
-    const user=await db.collection('users').findOne(
-      {user_id:userid},
-      {projection: { password: 0 } }
-    )
-    if(!user) return res.status(404).json({ message: 'User not found' });
+    const user = await db.collection('users').findOne(
+      query,
+      { projection: { password: 0 } }
+    );
+    if (!user) return res.status(404).json({ message: 'User not found' });
     res.status(200).json({ message: 'User fetched successfully', user });
   }
   catch(error){

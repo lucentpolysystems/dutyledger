@@ -39,16 +39,16 @@ exports.sendWelcomeMail = async (req, res) => {
     const link = `${process.env.FRONTEND_URL}/set-password?token=${token}`;
 
     await transporter.sendMail({
-      from: `"Payroll App" <${process.env.SMTP_EMAIL}>`,
+      from: `"Lucent Polysystem Pvt. Ltd." <${process.env.SMTP_EMAIL}>`,
       to: email,
-      subject: "Welcome to the Team – Set Your Password",
+      subject: "Welcome to Lucent Polysystem – Set Your Password",
       html: `
         <p>Hello <strong>${name}</strong>,</p>
-        <p>Your HR has created an account for you.</p>
+        <p>Your account has been created at <strong>Lucent Polysystem Pvt. Ltd.</strong></p>
         <p>Click the link below to set your password (valid for 1 hour):</p>
         <a href="${link}">${link}</a>
         <br /><br />
-        <p>If you weren't expecting this email, you can ignore it.</p>
+        <p>Best regards,<br><strong>Lucent Polysystem Pvt. Ltd. HR Team</strong></p>
       `,
     });
 
