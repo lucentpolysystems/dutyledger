@@ -1,11 +1,17 @@
 import axios from "axios";
 
-const defaultBase = import.meta.env.DEV ? "http://localhost:4500" : "";
-const rawBaseUrl = import.meta.env.VITE_API_BASE_URL !== undefined
-  ? import.meta.env.VITE_API_BASE_URL
-  : defaultBase;
+const getDynamicBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL !== undefined && import.meta.env.VITE_API_BASE_URL !== "") {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  if (typeof window !== "undefined" && window.location.hostname) {
+    const hostname = window.location.hostname;
+    return `http://${hostname}:4500`;
+  }
+  return import.meta.env.DEV ? "http://localhost:4500" : "";
+};
 
-export const API_BASE_URL = rawBaseUrl.replace(/\/+$/, "");
+export const API_BASE_URL = getDynamicBaseUrl().replace(/\/+$/, "");
 
 export const apiUrl = (path) => {
   if (!path) return API_BASE_URL;

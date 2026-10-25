@@ -21,8 +21,9 @@ let server;
 // 2. Start server after database connection is verified
 connectToDB()
   .then(() => {
-    server = app.listen(PORT, () => {
-      console.log(`🚀 Server is running at http://localhost:${PORT}`);
+    server = app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 Server is running locally at http://localhost:${PORT}`);
+      console.log(`🌐 Network / LAN access listening on http://0.0.0.0:${PORT}`);
       console.log(`🩺 Health check accessible at http://localhost:${PORT}/health`);
     });
   })
