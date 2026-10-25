@@ -86,8 +86,12 @@ app.get('/health', async (req, res) => {
       uptimeSeconds: Math.floor(process.uptime()),
       database: {
         status: 'connected',
-        type: 'PostgreSQL 16 (Prisma)',
+        type: 'PostgreSQL (Prisma)',
         latencyMs,
+      },
+      memory: {
+        rssMb: (process.memoryUsage().rss / 1024 / 1024).toFixed(1),
+        heapUsedMb: (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1),
       },
       environment: process.env.NODE_ENV || 'development',
     });
