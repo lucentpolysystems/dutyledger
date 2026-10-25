@@ -8,7 +8,7 @@ const initialUsers = [
     username: "Admin User",
     userId: "ADMIN001",
     gender: "Male",
-    joiningDate: new Date().toISOString().split("T")[0],
+    joiningDate: "2022-01-01",
     designation: "HR Manager",
     department: "Human Resources",
     address: "Lucent PolySystems Pvt. Ltd., Corporate Office",
@@ -18,7 +18,7 @@ const initialUsers = [
     role: "HR",
     roles: ["ROLE_SUPER_ADMIN", "ROLE_HR"],
     salary: 100000,
-    employmentType: "Full-time",
+    employmentType: "On Roll",
     attendanceType: "Office",
     emergencyContact: "9876543211",
     emergencyContactName: "Emergency Contact",
@@ -26,25 +26,193 @@ const initialUsers = [
     plainPassword: "admin123",
   },
   {
-    username: "John Doe",
-    userId: "EMP001",
-    gender: "Male",
-    joiningDate: new Date().toISOString().split("T")[0],
-    designation: "Polymer Production Engineer",
-    department: "Engineering",
-    address: "Lucent PolySystems Pvt. Ltd., Plant Staff Quarters",
-    bankAccount: "987654321098",
-    mobile: "9123456780",
-    email: "employee@example.com",
+    username: "LISSY KURUVILLA THOTTUPURATHE",
+    userId: "1212",
+    gender: "Female",
+    joiningDate: "2024-01-01",
+    designation: "Inspector",
+    department: "Quality",
+    address: "Lucent PolySystems Pvt. Ltd. Staff",
+    bankAccount: "12120001212",
+    mobile: "9820011212",
+    email: "lissy.1212@lucentpolysystems.com",
     role: "Employee",
     roles: ["ROLE_EMPLOYEE"],
-    salary: 75000,
-    employmentType: "Full-time",
+    salary: 17328,
+    employmentType: "On Roll",
     attendanceType: "Office",
-    emergencyContact: "9123456781",
-    emergencyContactName: "Jane Doe",
-    ifsc: "HDFC0001234",
-    plainPassword: "employee123",
+    emergencyContact: "9820011213",
+    emergencyContactName: "Family",
+    ifsc: "HDFC0001212",
+    plainPassword: "password123",
+  },
+  {
+    username: "BABITA MANOHAR KAMBLE",
+    userId: "1380",
+    gender: "Female",
+    joiningDate: "2024-01-01",
+    designation: "Finishing",
+    department: "Quality",
+    address: "Lucent PolySystems Pvt. Ltd. Staff",
+    bankAccount: "13800001380",
+    mobile: "9820011380",
+    email: "babita.1380@lucentpolysystems.com",
+    role: "Employee",
+    roles: ["ROLE_EMPLOYEE"],
+    salary: 17104,
+    employmentType: "On Roll",
+    attendanceType: "Office",
+    emergencyContact: "9820011381",
+    emergencyContactName: "Family",
+    ifsc: "HDFC0001380",
+    plainPassword: "password123",
+  },
+  {
+    username: "HARSHAL ULHAS SHEP",
+    userId: "0001",
+    gender: "Male",
+    joiningDate: "2023-01-01",
+    designation: "Account & Mktg",
+    department: "Account & Mktg",
+    address: "Lucent PolySystems Pvt. Ltd. Corporate",
+    bankAccount: "00010000001",
+    mobile: "9820010001",
+    email: "harshal.0001@lucentpolysystems.com",
+    role: "Employee",
+    roles: ["ROLE_EMPLOYEE", "ROLE_MANAGER"],
+    salary: 57830,
+    employmentType: "On Roll",
+    attendanceType: "Office",
+    emergencyContact: "9820010002",
+    emergencyContactName: "Family",
+    ifsc: "SBIN0000001",
+    plainPassword: "password123",
+  },
+  {
+    username: "SHOBHA DIPAK KANADE",
+    userId: "1211",
+    gender: "Female",
+    joiningDate: "2024-01-01",
+    designation: "Finishing",
+    department: "Quality",
+    address: "Lucent PolySystems Pvt. Ltd. Staff",
+    bankAccount: "12110001211",
+    mobile: "9820011211",
+    email: "shobha.1211@lucentpolysystems.com",
+    role: "Employee",
+    roles: ["ROLE_EMPLOYEE"],
+    salary: 17104,
+    employmentType: "On Roll",
+    attendanceType: "Office",
+    emergencyContact: "9820011214",
+    emergencyContactName: "Family",
+    ifsc: "HDFC0001211",
+    plainPassword: "password123",
+  },
+  {
+    username: "SIDDHESHWAR TULSHIRAM PHAD",
+    userId: "1010",
+    gender: "Male",
+    joiningDate: "2022-01-01",
+    designation: "Plant Head",
+    department: "Production",
+    address: "Lucent PolySystems Pvt. Ltd. Executive",
+    bankAccount: "10100001010",
+    mobile: "9820011010",
+    email: "siddheshwar.1010@lucentpolysystems.com",
+    role: "Employee",
+    roles: ["ROLE_EMPLOYEE", "ROLE_MANAGER"],
+    salary: 66472,
+    employmentType: "On Roll",
+    attendanceType: "Office",
+    emergencyContact: "9820011011",
+    emergencyContactName: "Family",
+    ifsc: "SBIN0001010",
+    plainPassword: "password123",
+  },
+  {
+    username: "SAVITA NARAYAN KAMBLE",
+    userId: "1209",
+    gender: "Female",
+    joiningDate: "2024-01-01",
+    designation: "Inspector",
+    department: "Quality",
+    address: "Lucent PolySystems Pvt. Ltd. Staff",
+    bankAccount: "12090001209",
+    mobile: "9820011209",
+    email: "savita.1209@lucentpolysystems.com",
+    role: "Employee",
+    roles: ["ROLE_EMPLOYEE"],
+    salary: 18824,
+    employmentType: "On Roll",
+    attendanceType: "Office",
+    emergencyContact: "9820011210",
+    emergencyContactName: "Family",
+    ifsc: "HDFC0001209",
+    plainPassword: "password123",
+  },
+  {
+    username: "JITENDRA BALU SONAR",
+    userId: "1029",
+    gender: "Male",
+    joiningDate: "2023-01-01",
+    designation: "Store Despatch Head",
+    department: "Store & Despatch",
+    address: "Lucent PolySystems Pvt. Ltd. Staff",
+    bankAccount: "10290001029",
+    mobile: "9820011029",
+    email: "jitendra.1029@lucentpolysystems.com",
+    role: "Employee",
+    roles: ["ROLE_EMPLOYEE", "ROLE_TEAM_LEADER"],
+    salary: 33444,
+    employmentType: "On Roll",
+    attendanceType: "Office",
+    emergencyContact: "9820011030",
+    emergencyContactName: "Family",
+    ifsc: "HDFC0001029",
+    plainPassword: "password123",
+  },
+  {
+    username: "AMOL SHRIRAM MULE",
+    userId: "1015",
+    gender: "Male",
+    joiningDate: "2023-01-01",
+    designation: "Despatched",
+    department: "Store",
+    address: "Lucent PolySystems Pvt. Ltd. Staff",
+    bankAccount: "10150001015",
+    mobile: "9820011015",
+    email: "amol.1015@lucentpolysystems.com",
+    role: "Employee",
+    roles: ["ROLE_EMPLOYEE"],
+    salary: 40000,
+    employmentType: "On Roll",
+    attendanceType: "Office",
+    emergencyContact: "9820011016",
+    emergencyContactName: "Family",
+    ifsc: "HDFC0001015",
+    plainPassword: "password123",
+  },
+  {
+    username: "TUSHAR GOVINDA KOSHTI",
+    userId: "1013",
+    gender: "Male",
+    joiningDate: "2023-01-01",
+    designation: "QA",
+    department: "Quality",
+    address: "Lucent PolySystems Pvt. Ltd. Staff",
+    bankAccount: "10130001013",
+    mobile: "9820011013",
+    email: "tushar.1013@lucentpolysystems.com",
+    role: "Employee",
+    roles: ["ROLE_EMPLOYEE"],
+    salary: 33000,
+    employmentType: "On Roll",
+    attendanceType: "Office",
+    emergencyContact: "9820011014",
+    emergencyContactName: "Family",
+    ifsc: "HDFC0001013",
+    plainPassword: "password123",
   },
 ];
 
@@ -99,53 +267,58 @@ const standardRoles = [
       "employees:read:all",
       "employees:create",
       "employees:update",
-      "employees:delete",
       "attendance:read:all",
-      "attendance:adjust",
+      "attendance:update",
+      "attendance:export",
       "payroll:read:all",
-      "payroll:structure:manage",
-      "payroll:slip:generate",
-      "queries:resolve",
-      "announcements:publish",
+      "payroll:generate",
+      "payroll:publish",
+      "announcements:write",
+      "announcements:read",
+      "holidays:manage",
+      "holidays:read",
     ],
   },
   {
     roleId: "ROLE_MANAGER",
     name: "Department Manager",
-    description: "Operations / Plant Manager with scoped department oversight",
+    description: "Department-level management. Approves leaves and tracks team attendance",
     isSystemRole: true,
     inheritsFrom: ["ROLE_EMPLOYEE"],
     permissions: [
       "employees:read:dept",
       "attendance:read:dept",
-      "attendance:adjust",
-      "queries:read:team",
+      "attendance:approve:dept",
+      "announcements:read",
+      "holidays:read",
     ],
   },
   {
     roleId: "ROLE_TEAM_LEADER",
-    name: "Team Leader / Supervisor",
-    description: "Shift In-Charge for shift attendance and team management",
+    name: "Team Leader",
+    description: "Direct reports tracking and day-to-day team shift management",
     isSystemRole: true,
     inheritsFrom: ["ROLE_EMPLOYEE"],
     permissions: [
       "employees:read:team",
       "attendance:read:team",
-      "queries:read:team",
+      "announcements:read",
+      "holidays:read",
     ],
   },
   {
     roleId: "ROLE_EMPLOYEE",
-    name: "Standard Employee",
-    description: "Employee self-service portal access",
+    name: "Employee Staff",
+    description: "Standard employee self-service portal access",
     isSystemRole: true,
     inheritsFrom: [],
     permissions: [
-      "employees:read:self",
-      "attendance:mark:self",
       "attendance:read:self",
+      "attendance:punch",
       "payroll:read:self",
-      "queries:create",
+      "announcements:read",
+      "holidays:read",
+      "hr:query:create",
     ],
   },
 ];
@@ -153,27 +326,28 @@ const standardRoles = [
 async function main() {
   console.log("🌱 Seeding production PostgreSQL database for Lucent PolySystems...");
 
-  // 1. Seed Roles
-  for (const r of standardRoles) {
+  // 1. Seed RBAC Roles
+  for (const role of standardRoles) {
     await prisma.role.upsert({
-      where: { roleId: r.roleId },
+      where: { roleId: role.roleId },
       update: {
-        name: r.name,
-        description: r.description,
-        permissions: r.permissions,
-        inheritsFrom: r.inheritsFrom,
+        name: role.name,
+        description: role.description,
+        isSystemRole: role.isSystemRole,
+        inheritsFrom: role.inheritsFrom,
+        permissions: role.permissions,
       },
-      create: r,
+      create: role,
     });
   }
   console.log(`✅ Seeded ${standardRoles.length} RBAC roles.`);
 
-  // 2. Seed Users
+  // 2. Seed Users & Salary Structures
   for (const user of initialUsers) {
     const { plainPassword, ...userData } = user;
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
-    const seededUser = await prisma.user.upsert({
+    await prisma.user.upsert({
       where: { userId: user.userId },
       update: {
         username: user.username,
@@ -184,6 +358,8 @@ async function main() {
         department: user.department,
         designation: user.designation,
         salary: user.salary,
+        employmentType: user.employmentType,
+        attendanceType: user.attendanceType,
       },
       create: {
         ...userData,
@@ -195,6 +371,7 @@ async function main() {
     await prisma.salaryInfo.upsert({
       where: { employeeId: user.userId },
       update: {
+        employeeName: user.username,
         baseSalary: user.salary,
         hra: Math.round(user.salary * 0.4),
       },
@@ -203,7 +380,7 @@ async function main() {
         employeeName: user.username,
         baseSalary: user.salary,
         hra: Math.round(user.salary * 0.4),
-        bonus: 5000,
+        bonus: 0,
         taxPercent: 10,
         pfPercent: 12,
         paidLeavesAllowed: 2,
@@ -212,7 +389,7 @@ async function main() {
       },
     });
 
-    console.log(`✅ Seeded user & salary structure: [${user.role}] ${user.userId} (${user.email})`);
+    console.log(`✅ Seeded: [Ticket ${user.userId}] ${user.username} - ${user.designation} (${user.department}) - ₹${user.salary}`);
   }
 
   // 4. Seed 2026 Holidays
@@ -226,19 +403,13 @@ async function main() {
   console.log(`✅ Seeded ${holidays2026.length} company holidays.`);
 
   console.log("\n=======================================================");
-  console.log(" 🔑 DEFAULT LOGIN CREDENTIALS");
+  console.log(" 🔑 ALL SEEDED USERS & DEFAULT PASSWORDS");
   console.log("=======================================================");
-  console.log(" 1. HR ADMIN USER:");
-  console.log("    User ID : ADMIN001");
-  console.log("    Username: Admin User");
-  console.log("    Email   : admin@example.com");
-  console.log("    Password: admin123");
-  console.log("-------------------------------------------------------");
-  console.log(" 2. EMPLOYEE USER:");
-  console.log("    User ID : EMP001");
-  console.log("    Username: John Doe");
-  console.log("    Email   : employee@example.com");
-  console.log("    Password: employee123");
+  console.log(" Default Employee Password: password123");
+  console.log(" Default HR Admin Password : admin123 (ADMIN001)\n");
+  for (const u of initialUsers) {
+    console.log(` - Ticket/ID: ${u.userId.padEnd(8)} | Name: ${u.username.padEnd(32)} | Dept: ${u.department.padEnd(18)} | Pass: ${u.plainPassword}`);
+  }
   console.log("=======================================================\n");
 }
 
