@@ -1,7 +1,13 @@
-const { MongoClient } = require("mongodb");
-const bcrypt = require("bcrypt");
-const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, "../../auth.env") });
+import { MongoClient } from "mongodb";
+import bcrypt from "bcrypt";
+import path from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, "../../auth.env") });
+dotenv.config();
 
 const mongoURI = process.env.MONGO_URI || "mongodb://localhost:27017/Attendance";
 const dbName = "Attendance";
@@ -172,7 +178,7 @@ function resolveRolePermissions(roleId) {
   return Array.from(permSet);
 }
 
-// 3. SAMPLE HIERARCHICAL USERS (Lucent Polysystem Pvt. Ltd.)
+// 3. SAMPLE HIERARCHICAL USERS (Lucent PolySystems Pvt. Ltd.)
 const initialUsers = [
   {
     user_id: "SUPER001",

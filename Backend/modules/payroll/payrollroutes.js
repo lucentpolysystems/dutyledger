@@ -1,23 +1,21 @@
-const express = require("express");
-const authenticateToken = require("../../middlewares/authMiddleware");
-const { requirePermission } = require("../../middlewares/rbacMiddleware");
-const {
+import express from "express";
+import authenticateToken from "../../middlewares/authMiddleware.js";
+import { requirePermission } from "../../middlewares/rbacMiddleware.js";
+import {
   GenerateSlip,
   Addsalaryinfo,
   Updatesalaryinfo,
   usersalarybyitsid,
-} = require("./payrollcontroller");
+} from "./payrollcontroller.js";
 
 const router = express.Router();
 
 // Self-check or HR permission for ID params
 const allowSelfOrPermission = (perm) => {
   return (req, res, next) => {
-    // If requesting own salary, allow
     if (req.user && (req.user.user_id === req.params.id || req.user.userId === req.params.id)) {
       return next();
     }
-    // Otherwise require HR permission
     return requirePermission(perm)(req, res, next);
   };
 };
@@ -39,4 +37,4 @@ router.post("/usersalaryinfo/add", authenticateToken, requirePermission("payroll
 router.put("/usersalaryinfo/update", authenticateToken, requirePermission("payroll:structure:manage"), Updatesalaryinfo);
 router.get("/usersalaryinfo/:id", authenticateToken, allowSelfOrPermission("payroll:read:all"), usersalarybyitsid);
 
-module.exports = router;
+export default router;

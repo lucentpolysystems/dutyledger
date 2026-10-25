@@ -1,10 +1,7 @@
-const { getDB } = require("../config/db");
+import { getDB } from "../config/db.js";
 
 /**
  * Middleware to enforce granular role-based permissions.
- * Usage:
- *   router.get('/salary', authenticateToken, requirePermission('payroll:read:all'), controller);
- *   router.post('/role', authenticateToken, requirePermission('rbac:roles:manage'), controller);
  */
 const requirePermission = (...requiredPermissions) => {
   return async (req, res, next) => {
@@ -56,4 +53,5 @@ const requirePermission = (...requiredPermissions) => {
   };
 };
 
-module.exports = { requirePermission };
+export { requirePermission };
+export default { requirePermission };

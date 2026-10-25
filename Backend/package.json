@@ -2,6 +2,7 @@
   "name": "attendance-payroll-backend",
   "version": "1.0.0",
   "description": "Production-ready Express + Prisma + PostgreSQL backend for Attendance and Payroll Management",
+  "type": "module",
   "main": "Servercopy.js",
   "scripts": {
     "start": "node Servercopy.js",

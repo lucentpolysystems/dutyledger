@@ -1,5 +1,5 @@
-const { getDB } = require("../../config/db");
-const transporter = require("../mail/mailtransporter");
+import { getDB } from "../../config/db.js";
+import transporter from "../mail/mailtransporter.js";
 
 // ✅ 1. GET USER SALARY INFO BY ID (Self-Healing Fallback from users collection)
 const usersalarybyitsid = async (req, res) => {
@@ -285,9 +285,9 @@ const Updatesalaryinfo = async (req, res) => {
     if (user?.email && transporter) {
       try {
         transporter.sendMail({
-          from: `"Lucent Polysystem Pvt. Ltd." <${process.env.SMTP_EMAIL || "hr@lucentpolysystem.com"}>`,
+          from: `"Lucent PolySystems Pvt. Ltd." <${process.env.SMTP_EMAIL || "hr@lucentpolysystem.com"}>`,
           to: user.email,
-          subject: "Lucent Polysystem – Salary Update Notification",
+          subject: "Lucent PolySystems – Salary Update Notification",
           html: `
             <p>Dear <strong>${updateFields.employee_name}</strong>,</p>
             <p>Your salary record has been successfully updated on ${new Date().toLocaleDateString()}.</p>
@@ -298,7 +298,7 @@ const Updatesalaryinfo = async (req, res) => {
               <li><strong>Tax:</strong> ${updateFields.tax_percent}%</li>
               <li><strong>PF:</strong> ${updateFields.pf_percent}%</li>
             </ul>
-            <p>Best regards,<br><strong>Lucent Polysystem Pvt. Ltd. HR Team</strong></p>
+            <p>Best regards,<br><strong>Lucent PolySystems Pvt. Ltd. HR Team</strong></p>
           `,
         }).catch((e) => console.log("Salary update email notice skipped:", e.message));
       } catch (err) {
@@ -316,7 +316,14 @@ const Updatesalaryinfo = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
+  GenerateSlip,
+  Addsalaryinfo,
+  Updatesalaryinfo,
+  usersalarybyitsid,
+};
+
+export default {
   GenerateSlip,
   Addsalaryinfo,
   Updatesalaryinfo,

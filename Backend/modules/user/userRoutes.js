@@ -1,7 +1,7 @@
-const express = require('express');
-const { getProfile, addUser, alluser, userByitsId, updateProfile } = require('./userController');
-const authenticateToken = require('../../middlewares/authMiddleware');
-const { requirePermission } = require('../../middlewares/rbacMiddleware');
+import express from 'express';
+import { getProfile, addUser, alluser, userByitsId, updateProfile } from './userController.js';
+import authenticateToken from '../../middlewares/authMiddleware.js';
+import { requirePermission } from '../../middlewares/rbacMiddleware.js';
 
 const router = express.Router();
 
@@ -11,4 +11,4 @@ router.post('/add', authenticateToken, requirePermission("employees:create"), ad
 router.get('/all', authenticateToken, alluser);
 router.get('/users/:userid', authenticateToken, userByitsId);
 
-module.exports = router;
+export default router;

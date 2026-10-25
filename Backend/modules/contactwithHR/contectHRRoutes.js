@@ -1,7 +1,8 @@
-const express = require("express");
+import express from "express";
+import { createRequest, getRequests, getRequestById, updateRequestStatus } from "./contectHRController.js";
+import authenticateToken from "../../middlewares/authMiddleware.js";
+
 const router = express.Router();
-const { createRequest, getRequests, getRequestById, updateRequestStatus } = require("./contectHRController");
-const authenticateToken = require("../../middlewares/authMiddleware");
 
 // Employee submits request
 router.post("/", createRequest);
@@ -15,4 +16,4 @@ router.get("/:id", getRequestById);
 // HR updates request status
 router.patch("/:id/status", authenticateToken, updateRequestStatus);
 
-module.exports = router;
+export default router;

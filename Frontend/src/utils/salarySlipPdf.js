@@ -27,7 +27,7 @@ async function getLogoDataUrl() {
 
 /**
  * Downloads a professionally formatted, branded, and watermarked
- * salary slip PDF for Lucent Polysystems.
+ * salary slip PDF for Lucent PolySystemss.
  *
  * @param {Object} item - Payroll slip data (attendance_summary, salary_breakdown, deductions, etc.)
  * @param {Object} user - Optional current user / employee object
@@ -77,14 +77,14 @@ export async function downloadSalarySlipPDF(item, user = {}) {
     // Diagonal Company Name Watermark
     doc.setFontSize(32);
     doc.setTextColor(30, 58, 138);
-    doc.text("LUCENT POLYSYSTEMS", 105, 168, { align: "center", angle: 32 });
+    doc.text("LUCENT PolySystemsS", 105, 168, { align: "center", angle: 32 });
 
     doc.restoreGraphicsState();
   } else {
     // Fallback watermark without GState
     doc.setFontSize(30);
     doc.setTextColor(243, 244, 246);
-    doc.text("LUCENT POLYSYSTEMS", 105, 168, { align: "center", angle: 32 });
+    doc.text("LUCENT PolySystemsS", 105, 168, { align: "center", angle: 32 });
   }
 
   // ==========================================
@@ -104,7 +104,7 @@ export async function downloadSalarySlipPDF(item, user = {}) {
 
   doc.setFontSize(15);
   doc.setTextColor(15, 23, 42); // Slate-900 (Bold)
-  doc.text("LUCENT POLYSYSTEMS", headerTextX, 19);
+  doc.text("LUCENT PolySystemsS", headerTextX, 19);
 
   doc.setFontSize(7.5);
   doc.setTextColor(71, 85, 105); // Slate-600
@@ -359,15 +359,15 @@ export async function downloadSalarySlipPDF(item, user = {}) {
   y += 4;
   doc.setFontSize(7.2);
   doc.setTextColor(100, 116, 139);
-  doc.text("Lucent Polysystems", 22, y);
-  doc.text("Lucent Polysystems", 90, y);
-  doc.text("Lucent Polysystems", 156, y);
+  doc.text("Lucent PolySystemss", 22, y);
+  doc.text("Lucent PolySystemss", 90, y);
+  doc.text("Lucent PolySystemss", 156, y);
 
   // Bottom seal / authentication text
   doc.setFontSize(6.8);
   doc.setTextColor(148, 163, 184);
   doc.text(
-    "* Official computer-generated payslip of Lucent Polysystems • Chakan, Pune – 410501 • GST: 27AACCL1694A1ZR • Confidential",
+    "* Official computer-generated payslip of Lucent PolySystemss • Chakan, Pune – 410501 • GST: 27AACCL1694A1ZR • Confidential",
     105,
     284,
     { align: "center" }

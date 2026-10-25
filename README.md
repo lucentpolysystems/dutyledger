@@ -1,6 +1,6 @@
 # 🚀 DutyLedger — Attendance & Payroll Management System
 
-A production-grade, containerized **Attendance, Leave, and Payroll Management System** developed for **Lucent Polysystem Pvt. Ltd.**  
+A production-grade, containerized **Attendance, Leave, and Payroll Management System** developed for **Lucent PolySystems Pvt. Ltd.**  
 Built with **Node.js (Express 5)**, **React 19 (Vite 6 + Tailwind CSS)**, and **PostgreSQL 16 with Prisma ORM**, completely orchestrated with **Docker Compose**, reverse-proxied via **Nginx Alpine**, and automated with **GitHub Actions CI/CD**.
 
 ---
@@ -32,7 +32,7 @@ graph LR
 ```
 
 - **Frontend**: Vite 6, React 19, Tailwind CSS 4, Redux Toolkit, Material-UI, Framer Motion, Recharts.
-- **Backend**: Node.js, Express 5, Prisma ORM, JWT, Bcrypt, Multer, Nodemailer.
+- **Backend**: Node.js 20+ (ES Modules), Express 5, Prisma ORM, JWT, Bcrypt, Multer, Nodemailer.
 - **ORM & Database**: Prisma ORM with PostgreSQL 16 Alpine.
 - **Containerization**: Multi-stage Docker build for client (Node -> Nginx Alpine), optimized Node Alpine for backend, and PostgreSQL service with automated healthchecks.
 - **CI/CD**: GitHub Actions workflow verifying Prisma schema validation, database migrations against test PostgreSQL, frontend production build, and Docker image validation.
@@ -165,4 +165,4 @@ dutyledger/
 ---
 
 ## 📜 License
-Developed for **Lucent Polysystem Pvt. Ltd.** All rights reserved.
+Developed for **Lucent PolySystems Pvt. Ltd.** All rights reserved.

@@ -169,9 +169,9 @@ const chatbot = () => {
   // Define the system prompt with information about your project.
   // This is the key to customizing the chatbot's knowledge.
   // You can put all your project's details here.
-  const systemPrompt = `You are a helpful employee assistance chatbot for "Lucent Polysystem Pvt. Ltd.". Your purpose is to provide employees with guidance and information related to Lucent Polysystem's workplace policies, Attendance, Leave requests, and Payroll inquiries.
+  const systemPrompt = `You are a helpful employee assistance chatbot for "Lucent PolySystems Pvt. Ltd.". Your purpose is to provide employees with guidance and information related to Lucent PolySystems's workplace policies, Attendance, Leave requests, and Payroll inquiries.
 
-  About Lucent Polysystem Pvt. Ltd.:
+  About Lucent PolySystems Pvt. Ltd.:
   - We specialize in high-performance polymer solutions, masterbatches, and engineering materials.
   - Workplace hours: Office & plant hours are typically 9:00 AM to 6:00 PM.
   - Attendance: Punch-in must be marked through the Attendance portal when within office geofence range.
@@ -206,7 +206,7 @@ const chatbot = () => {
         role: 'user',
         parts: [{ text: fullPrompt }],
       }];
-      
+
       const payload = { contents: chatHistory };
       const apiKey = "AIzaSyBf5z-UziaT2xF9G_MktZfdaEd2obV9_h0"; // Your API key goes here
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
@@ -224,8 +224,8 @@ const chatbot = () => {
       const result = await response.json();
 
       if (result.candidates && result.candidates.length > 0 &&
-          result.candidates[0].content && result.candidates[0].content.parts &&
-          result.candidates[0].content.parts.length > 0) {
+        result.candidates[0].content && result.candidates[0].content.parts &&
+        result.candidates[0].content.parts.length > 0) {
         const aiResponseText = result.candidates[0].content.parts[0].text;
         const aiMessage = { sender: 'ai', text: aiResponseText };
         setMessages(prevMessages => [...prevMessages, aiMessage]);
@@ -262,11 +262,10 @@ const chatbot = () => {
               className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[75%] px-4 py-2 rounded-lg shadow-md ${
-                  message.sender === 'user'
-                    ? 'bg-indigo-500 text-white rounded-br-none'
-                    : 'bg-gray-200 text-gray-800 rounded-bl-none'
-                }`}
+                className={`max-w-[75%] px-4 py-2 rounded-lg shadow-md ${message.sender === 'user'
+                  ? 'bg-indigo-500 text-white rounded-br-none'
+                  : 'bg-gray-200 text-gray-800 rounded-bl-none'
+                  }`}
               >
                 {message.text}
               </div>
@@ -294,11 +293,10 @@ const chatbot = () => {
             />
             <button
               type="submit"
-              className={`p-3 rounded-full text-white transition-all duration-200 ${
-                isLoading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-indigo-500 hover:bg-indigo-600 transform active:scale-95'
-              }`}
+              className={`p-3 rounded-full text-white transition-all duration-200 ${isLoading
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-indigo-500 hover:bg-indigo-600 transform active:scale-95'
+                }`}
               disabled={isLoading}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

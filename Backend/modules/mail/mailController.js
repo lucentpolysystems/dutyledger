@@ -1,9 +1,9 @@
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken"); 
-const { getDB } = require("../../config/db");
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { getDB } from "../../config/db.js";
+import transporter from "./mailtransporter.js";
 
-
-exports.setPassword = async (req, res) => {
+export const setPassword = async (req, res) => {
   const { token, password } = req.body;
   const db = getDB();
 
@@ -21,8 +21,7 @@ exports.setPassword = async (req, res) => {
     await db.collection("users").updateOne(
       { email: decoded.email },
       {
-        $set: { password: hashed },
-        $unset: { passwordSetToken: "", tokenExpiry: "" },
+        $set: { password: hashed, passwordSetToken: null, tokenExpiry: null },
       }
     );
 
@@ -32,23 +31,23 @@ exports.setPassword = async (req, res) => {
   }
 };
 
-exports.sendWelcomeMail = async (req, res) => {
+export const sendWelcomeMail = async (req, res) => {
   const { email, name, token } = req.body;
 
   try {
     const link = `${process.env.FRONTEND_URL}/set-password?token=${token}`;
 
     await transporter.sendMail({
-      from: `"Lucent Polysystem Pvt. Ltd." <${process.env.SMTP_EMAIL}>`,
+      from: `"Lucent PolySystems Pvt. Ltd." <${process.env.SMTP_EMAIL}>`,
       to: email,
-      subject: "Welcome to Lucent Polysystem – Set Your Password",
+      subject: "Welcome to Lucent PolySystems – Set Your Password",
       html: `
         <p>Hello <strong>${name}</strong>,</p>
-        <p>Your account has been created at <strong>Lucent Polysystem Pvt. Ltd.</strong></p>
+        <p>Your account has been created at <strong>Lucent PolySystems Pvt. Ltd.</strong></p>
         <p>Click the link below to set your password (valid for 1 hour):</p>
         <a href="${link}">${link}</a>
         <br /><br />
-        <p>Best regards,<br><strong>Lucent Polysystem Pvt. Ltd. HR Team</strong></p>
+        <p>Best regards,<br><strong>Lucent PolySystems Pvt. Ltd. HR Team</strong></p>
       `,
     });
 
@@ -58,3 +57,5 @@ exports.sendWelcomeMail = async (req, res) => {
     res.status(500).json({ message: "Failed to send email", error: err.message });
   }
 };
+
+export default { setPassword, sendWelcomeMail };

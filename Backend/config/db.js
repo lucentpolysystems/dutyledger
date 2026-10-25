@@ -1,8 +1,14 @@
-const { PrismaClient } = require('@prisma/client');
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../auth.env') });
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
-require('dotenv').config();
+import { PrismaClient } from '@prisma/client';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, '../auth.env') });
+dotenv.config({ path: path.join(__dirname, '../.env') });
+dotenv.config();
 
 // Ensure DATABASE_URL is set or constructed from components
 if (!process.env.DATABASE_URL) {
@@ -341,9 +347,18 @@ const getDB = () => {
   };
 };
 
-module.exports = {
+const connectToMongoDB = connectToDB;
+
+export {
   prisma,
   connectToDB,
-  connectToMongoDB: connectToDB, // Backward compatibility with Servercopy.js
+  connectToMongoDB,
+  getDB,
+};
+
+export default {
+  prisma,
+  connectToDB,
+  connectToMongoDB,
   getDB,
 };

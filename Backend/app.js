@@ -1,18 +1,18 @@
-const express = require('express');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const { prisma } = require('./config/db');
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import { prisma } from './config/db.js';
 
-const authRoutes = require('./modules/auth/authRoutes');
-const userRoutes = require('./modules/user/userRoutes');
-const attendanceRoutes = require("./modules/attendanceCopy/attendance.routes");
-const payrollroutes = require('./modules/payroll/payrollroutes');
-const calendar = require('./modules/calendar/holidayRoutes');
-const mailroutes = require('./modules/mail/mailroutes');
-const cloudinaryroutes = require('./modules/cloudinary/cloudinaryroutes');
-const contectHRRoutes = require('./modules/contactwithHR/contectHRRoutes');
-const announcementRoutes = require('./modules/announcements/announcements.routes');
-const rbacRoutes = require('./modules/rbac/rbacRoutes');
+import authRoutes from './modules/auth/authRoutes.js';
+import userRoutes from './modules/user/userRoutes.js';
+import attendanceRoutes from './modules/attendanceCopy/attendance.routes.js';
+import payrollroutes from './modules/payroll/payrollroutes.js';
+import calendar from './modules/calendar/holidayRoutes.js';
+import mailroutes from './modules/mail/mailroutes.js';
+import cloudinaryroutes from './modules/cloudinary/cloudinaryroutes.js';
+import contectHRRoutes from './modules/contactwithHR/contectHRRoutes.js';
+import announcementRoutes from './modules/announcements/announcements.routes.js';
+import rbacRoutes from './modules/rbac/rbacRoutes.js';
 
 const app = express();
 
@@ -68,4 +68,5 @@ app.use('/api/contact-hr', contectHRRoutes);
 app.use('/api', announcementRoutes);
 app.use('/api/rbac', rbacRoutes);
 
-module.exports = app;
+export default app;
+export { app };

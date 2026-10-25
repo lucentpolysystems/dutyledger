@@ -1,4 +1,4 @@
-const { getDB } = require("../../config/db");
+import { getDB } from "../../config/db.js";
 
 // Helper to format Date in 12-hour AM/PM format
 const formatTimeAMPM = (dateObj) => {
@@ -15,7 +15,7 @@ const formatTimeAMPM = (dateObj) => {
 };
 
 // ✅ GET /attendance/:userId
-exports.getTodayAttendance = async (req, res) => {
+export const getTodayAttendance = async (req, res) => {
   const db = getDB();
   const user_id = String(req.params.userId);
   const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
@@ -41,7 +41,7 @@ exports.getTodayAttendance = async (req, res) => {
 };
 
 // ✅ POST /mark-attendance
-exports.markAttendance = async (req, res) => {
+export const markAttendance = async (req, res) => {
   try {
     const db = getDB();
     const { username, location, id, punchType } = req.body;
@@ -206,7 +206,7 @@ exports.markAttendance = async (req, res) => {
 };
 
 // ✅ GET /all-attendance
-exports.getAllAttendance = async (req, res) => {
+export const getAllAttendance = async (req, res) => {
   try {
     const db = getDB();
     const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
@@ -225,7 +225,7 @@ exports.getAllAttendance = async (req, res) => {
 };
 
 // ✅ GET /getAllAttendanceByMonthofuser/:userId/:month
-exports.getAllAttendanceByMonthofuser = async (req, res) => {
+export const getAllAttendanceByMonthofuser = async (req, res) => {
   const db = getDB();
   const { userId, month } = req.params;
 
@@ -259,7 +259,7 @@ exports.getAllAttendanceByMonthofuser = async (req, res) => {
 };
 
 // ✅ GET /all-attendance-by-month/:month
-exports.getAllAttendanceByMonth = async (req, res) => {
+export const getAllAttendanceByMonth = async (req, res) => {
   try {
     const db = getDB();
     const { month } = req.params;
@@ -283,4 +283,12 @@ exports.getAllAttendanceByMonth = async (req, res) => {
     console.error("❌ Error fetching all monthly attendance:", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
+};
+
+export default {
+  getTodayAttendance,
+  markAttendance,
+  getAllAttendance,
+  getAllAttendanceByMonthofuser,
+  getAllAttendanceByMonth,
 };

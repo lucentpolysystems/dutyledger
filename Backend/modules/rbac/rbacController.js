@@ -1,9 +1,9 @@
-const { getDB } = require("../../config/db");
-const {
+import { getDB, prisma } from "../../config/db.js";
+import {
   compileUserPermissions,
   recomputeAndSaveUserPermissions,
   logAuditEvent,
-} = require("./rbacService");
+} from "./rbacService.js";
 
 // 1. GET ALL ROLES
 const getAllRoles = async (req, res) => {
@@ -277,7 +277,18 @@ const getAuditLogs = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
+  getAllRoles,
+  createRole,
+  updateRole,
+  deleteRole,
+  getAllPermissions,
+  getUsersWithRoles,
+  assignUserRoles,
+  getAuditLogs,
+};
+
+export default {
   getAllRoles,
   createRole,
   updateRole,

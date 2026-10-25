@@ -1,9 +1,15 @@
-const app = require('./app');
-const { connectToDB } = require('./config/db');
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, 'auth.env') });
-require('dotenv').config({ path: path.join(__dirname, '.env') });
-require('dotenv').config();
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import app from './app.js';
+import { connectToDB } from './config/db.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, 'auth.env') });
+dotenv.config({ path: path.join(__dirname, '.env') });
+dotenv.config();
 
 const PORT = process.env.PORT || 4500;
 

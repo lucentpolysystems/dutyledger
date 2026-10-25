@@ -1,9 +1,9 @@
-const express = require("express");
+import express from "express";
+import { setPassword, sendWelcomeMail } from "./mailController.js";
+
 const router = express.Router();
-const { setPassword,sendWelcomeMail } = require("./mailController");
 
 router.post("/set-password", setPassword);
 router.post("/send-welcome-mail", sendWelcomeMail);
 
-module.exports = router;
-
+export default router;

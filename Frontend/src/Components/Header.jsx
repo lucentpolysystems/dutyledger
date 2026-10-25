@@ -8,12 +8,12 @@ const Header = () => {
       <div className="flex items-center space-x-3">
         <img
           src="/logo.jpg"
-          alt="Lucent Polysystem Pvt. Ltd."
+          alt="Lucent PolySystems Pvt. Ltd."
           className="h-10 w-auto object-contain rounded"
         />
         <div className="flex flex-col">
           <span className="text-sm sm:text-base font-bold text-gray-900 leading-tight">
-            Lucent Polysystem <span className="text-sky-600 text-xs font-semibold">Pvt. Ltd.</span>
+            Lucent PolySystems <span className="text-sky-600 text-xs font-semibold">Pvt. Ltd.</span>
           </span>
           <span className="text-[10px] sm:text-[11px] text-gray-500 font-medium">Attendance & Payroll System</span>
         </div>

@@ -1,8 +1,7 @@
-const { ObjectId } = require("mongodb");
-const { getDB } = require("../../config/db");
+import { getDB, prisma } from "../../config/db.js";
 
 // 📌 Create new HR request
-exports.createRequest = async (req, res) => {
+export const createRequest = async (req, res) => {
   try {
     const db = getDB();
     const { employeeId, employeeName, subject, category, priority, message, attachment } = req.body;
@@ -24,7 +23,7 @@ exports.createRequest = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "HR request submitted successfully",
-      request: { _id: result.insertedId, ...newRequest },
+      request: { _id: result.insertedId, id: result.insertedId, ...newRequest },
     });
   } catch (error) {
     res.status(500).json({ success: false, message: "Error creating request", error: error.message });
@@ -32,7 +31,7 @@ exports.createRequest = async (req, res) => {
 };
 
 // 📌 Get all HR requests
-exports.getRequests = async (req, res) => {
+export const getRequests = async (req, res) => {
   try {
     const db = getDB();
     const requests = await db.collection("HRRequests").find({}).sort({ createdAt: -1 }).toArray();
@@ -43,14 +42,12 @@ exports.getRequests = async (req, res) => {
 };
 
 // 📌 Get single HR request by ID
-exports.getRequestById = async (req, res) => {
+export const getRequestById = async (req, res) => {
   try {
-    const db = getDB();
-    if (!ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ success: false, message: "Invalid request ID" });
-    }
-
-    const request = await db.collection("HRRequests").findOne({ _id: new ObjectId(req.params.id) });
+    const { id } = req.params;
+    const request = await prisma.contactHR.findFirst({
+      where: { id }
+    });
     if (!request) return res.status(404).json({ success: false, message: "Request not found" });
     res.status(200).json({ success: true, request });
   } catch (error) {
@@ -59,16 +56,11 @@ exports.getRequestById = async (req, res) => {
 };
 
 // 📌 HR updates request status
-exports.updateRequestStatus = async (req, res) => {
+export const updateRequestStatus = async (req, res) => {
   try {
-    const db = getDB();
     const { id } = req.params;
     const { status } = req.body;
     const allowedStatuses = ["Pending", "In Progress", "Resolved"];
-
-    if (!ObjectId.isValid(id)) {
-      return res.status(400).json({ success: false, message: "Invalid request ID" });
-    }
 
     if (!allowedStatuses.includes(status)) {
       return res.status(400).json({
@@ -78,24 +70,14 @@ exports.updateRequestStatus = async (req, res) => {
     }
 
     const role = (req.user?.role || "").toLowerCase();
-    if (role !== "hr") {
+    if (role !== "hr" && role !== "admin" && role !== "super_admin") {
       return res.status(403).json({ success: false, message: "Only HR can update request status" });
     }
 
-    const result = await db.collection("HRRequests").findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      {
-        $set: {
-          status,
-          updatedAt: new Date(),
-        },
-      },
-      { returnDocument: "after" }
-    );
-
-    if (!result) {
-      return res.status(404).json({ success: false, message: "Request not found" });
-    }
+    const result = await prisma.contactHR.update({
+      where: { id },
+      data: { status, updatedAt: new Date() }
+    });
 
     res.status(200).json({
       success: true,
@@ -105,4 +87,11 @@ exports.updateRequestStatus = async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: "Error updating request status", error: error.message });
   }
+};
+
+export default {
+  createRequest,
+  getRequests,
+  getRequestById,
+  updateRequestStatus,
 };

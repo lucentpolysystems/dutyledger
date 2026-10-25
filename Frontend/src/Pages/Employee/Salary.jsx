@@ -21,7 +21,7 @@ const Salary = () => {
   const [openIndex, setOpenIndex] = useState(null);
   const now = new Date();
   const [selectedMonth, setSelectedMonth] = useState(String(now.getMonth() + 1).padStart(2, "0"));
-  const [selectedYear, setSelectedYear] = useState(String(now.getFullYear())); 
+  const [selectedYear, setSelectedYear] = useState(String(now.getFullYear()));
   const [data, setData] = useState([]);
 
   const user = useSelector((state) => state.auth.user);
@@ -86,7 +86,7 @@ const Salary = () => {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold rounded-full mb-2">
                 <img src="/logo.jpg" alt="Logo" className="w-4 h-4 object-contain rounded-xs" />
-                <Building2 className="w-3.5 h-3.5" /> Lucent Polysystems
+                <Building2 className="w-3.5 h-3.5" /> Lucent PolySystemss
               </div>
               <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">
                 Employee Salary & Payslips
@@ -162,7 +162,7 @@ const Salary = () => {
                         </span>
                       </div>
                       <div className="text-xs text-slate-500 font-medium mt-0.5">
-                        Lucent Polysystem Pvt. Ltd. • Employee ID: {item?.employee_id || item?.user_id || user?.id}
+                        Lucent PolySystems Pvt. Ltd. • Employee ID: {item?.employee_id || item?.user_id || user?.id}
                       </div>
                     </div>
                   </div>
@@ -316,7 +316,7 @@ const Salary = () => {
                         </div>
                         <div>
                           <div className="text-xs text-emerald-800 font-bold uppercase tracking-wider">
-                            Official Net Payable (Lucent Polysystem Pvt. Ltd.)
+                            Official Net Payable (Lucent PolySystems Pvt. Ltd.)
                           </div>
                           <div className="text-xs text-slate-500">
                             Direct Credit into verified salary account

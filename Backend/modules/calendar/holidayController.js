@@ -1,6 +1,6 @@
-const { getDB } = require('../../config/db');
+import { getDB } from '../../config/db.js';
 
-exports.addHoliday = async (req, res) => {
+export const addHoliday = async (req, res) => {
   try {
     const db = getDB();
     const { date, reason } = req.body;
@@ -17,7 +17,7 @@ exports.addHoliday = async (req, res) => {
   }
 };
 
-exports.getHolidays = async (req, res) => {
+export const getHolidays = async (req, res) => {
   try {
     const db = getDB();
     const holidays = await db.collection('Holidays').find({}).toArray();
@@ -27,3 +27,5 @@ exports.getHolidays = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export default { addHoliday, getHolidays };

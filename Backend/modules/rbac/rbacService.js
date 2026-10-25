@@ -1,5 +1,3 @@
-const { ObjectId } = require("mongodb");
-
 /**
  * Compiles a flat Set of permission codes given an array of role IDs and direct permissions.
  * Traverses role inheritance (inherits_from) recursively.
@@ -26,8 +24,8 @@ async function compileUserPermissions(db, roleIds = [], directPermissions = []) 
       roleDoc.permissions.forEach((p) => permissionSet.add(p));
     }
 
-    if (Array.isArray(roleDoc.inherits_from)) {
-      roleDoc.inherits_from.forEach((inheritedId) => {
+    if (Array.isArray(roleDoc.inheritsFrom || roleDoc.inherits_from)) {
+      (roleDoc.inheritsFrom || roleDoc.inherits_from).forEach((inheritedId) => {
         if (!visitedRoles.has(inheritedId)) {
           queue.push(inheritedId);
         }
@@ -42,17 +40,13 @@ async function compileUserPermissions(db, roleIds = [], directPermissions = []) 
  * Recomputes and updates a user's cached_permissions and bumps permission_version.
  */
 async function recomputeAndSaveUserPermissions(db, userId) {
-  const query = ObjectId.isValid(userId)
-    ? { $or: [{ _id: new ObjectId(userId) }, { user_id: userId }] }
-    : { user_id: userId };
-
-  const user = await db.collection("users").findOne(query);
+  const user = await db.collection("users").findOne({ user_id: userId });
   if (!user) return null;
 
-  const compiled = await compileUserPermissions(db, user.roles || [], user.direct_permissions || []);
+  const compiled = await compileUserPermissions(db, user.roles || [], user.directPermissions || user.direct_permissions || []);
 
   await db.collection("users").updateOne(
-    { _id: user._id },
+    { user_id: user.userId || user.user_id },
     {
       $set: {
         cached_permissions: compiled,
@@ -85,7 +79,13 @@ async function logAuditEvent(db, { actor_id, actor_name, action, resource, targe
   }
 }
 
-module.exports = {
+export {
+  compileUserPermissions,
+  recomputeAndSaveUserPermissions,
+  logAuditEvent,
+};
+
+export default {
   compileUserPermissions,
   recomputeAndSaveUserPermissions,
   logAuditEvent,

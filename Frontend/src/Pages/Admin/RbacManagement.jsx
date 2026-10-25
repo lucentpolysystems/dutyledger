@@ -291,12 +291,12 @@ const RbacManagement = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
-      
+
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
         <div>
           <div className="flex items-center gap-2 text-xs font-bold text-sky-600 uppercase tracking-wider mb-1">
-            <ShieldCheck className="w-4 h-4" /> Security & Governance • Lucent Polysystem Pvt. Ltd.
+            <ShieldCheck className="w-4 h-4" /> Security & Governance • Lucent PolySystems Pvt. Ltd.
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Role-Based Access Control (RBAC)
@@ -341,33 +341,30 @@ const RbacManagement = () => {
       <div className="flex border-b border-slate-200 space-x-6 text-sm font-bold">
         <button
           onClick={() => setActiveTab("roles")}
-          className={`pb-3 border-b-2 flex items-center gap-2 transition cursor-pointer ${
-            activeTab === "roles"
-              ? "border-sky-600 text-sky-600"
-              : "border-transparent text-slate-500 hover:text-slate-800"
-          }`}
+          className={`pb-3 border-b-2 flex items-center gap-2 transition cursor-pointer ${activeTab === "roles"
+            ? "border-sky-600 text-sky-600"
+            : "border-transparent text-slate-500 hover:text-slate-800"
+            }`}
         >
           <KeyRound className="w-4 h-4" /> Role Catalog & Permission Matrix
         </button>
 
         <button
           onClick={() => setActiveTab("users")}
-          className={`pb-3 border-b-2 flex items-center gap-2 transition cursor-pointer ${
-            activeTab === "users"
-              ? "border-sky-600 text-sky-600"
-              : "border-transparent text-slate-500 hover:text-slate-800"
-          }`}
+          className={`pb-3 border-b-2 flex items-center gap-2 transition cursor-pointer ${activeTab === "users"
+            ? "border-sky-600 text-sky-600"
+            : "border-transparent text-slate-500 hover:text-slate-800"
+            }`}
         >
           <Users className="w-4 h-4" /> Employee Role Assignments
         </button>
 
         <button
           onClick={() => setActiveTab("audit")}
-          className={`pb-3 border-b-2 flex items-center gap-2 transition cursor-pointer ${
-            activeTab === "audit"
-              ? "border-sky-600 text-sky-600"
-              : "border-transparent text-slate-500 hover:text-slate-800"
-          }`}
+          className={`pb-3 border-b-2 flex items-center gap-2 transition cursor-pointer ${activeTab === "audit"
+            ? "border-sky-600 text-sky-600"
+            : "border-transparent text-slate-500 hover:text-slate-800"
+            }`}
         >
           <FileText className="w-4 h-4" /> Compliance & Audit Logs
         </button>
@@ -378,7 +375,7 @@ const RbacManagement = () => {
       {/* ============================================================== */}
       {activeTab === "roles" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
+
           {/* Roles Selector List (Left 4 cols) */}
           <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-4 space-y-3">
             <div className="text-xs font-extrabold uppercase text-slate-400 tracking-wider">
@@ -392,11 +389,10 @@ const RbacManagement = () => {
                   <div
                     key={role.role_id}
                     onClick={() => handleSelectRole(role)}
-                    className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
-                      isSelected
-                        ? "bg-sky-50 border-sky-300 shadow-xs"
-                        : "bg-white border-slate-200/80 hover:bg-slate-50"
-                    }`}
+                    className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${isSelected
+                      ? "bg-sky-50 border-sky-300 shadow-xs"
+                      : "bg-white border-slate-200/80 hover:bg-slate-50"
+                      }`}
                   >
                     <div>
                       <div className="flex items-center gap-2">
@@ -483,11 +479,10 @@ const RbacManagement = () => {
                           return (
                             <label
                               key={perm.code}
-                              className={`p-2.5 rounded-lg border text-xs flex items-start gap-2.5 transition cursor-pointer ${
-                                isChecked
-                                  ? "bg-white border-sky-300 shadow-2xs"
-                                  : "bg-slate-100/50 border-slate-200 text-slate-500"
-                              }`}
+                              className={`p-2.5 rounded-lg border text-xs flex items-start gap-2.5 transition cursor-pointer ${isChecked
+                                ? "bg-white border-sky-300 shadow-2xs"
+                                : "bg-slate-100/50 border-slate-200 text-slate-500"
+                                }`}
                             >
                               <input
                                 type="checkbox"
@@ -578,15 +573,14 @@ const RbacManagement = () => {
                           {userRoleList.map((rId) => (
                             <span
                               key={rId}
-                              className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
-                                rId.includes("SUPER")
-                                  ? "bg-purple-100 text-purple-800"
-                                  : rId.includes("HR")
+                              className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${rId.includes("SUPER")
+                                ? "bg-purple-100 text-purple-800"
+                                : rId.includes("HR")
                                   ? "bg-sky-100 text-sky-800"
                                   : rId.includes("PAYROLL")
-                                  ? "bg-emerald-100 text-emerald-800"
-                                  : "bg-slate-100 text-slate-700"
-                              }`}
+                                    ? "bg-emerald-100 text-emerald-800"
+                                    : "bg-slate-100 text-slate-700"
+                                }`}
                             >
                               {rId.replace("ROLE_", "")}
                             </span>
@@ -755,9 +749,8 @@ const RbacManagement = () => {
                 return (
                   <label
                     key={role.role_id}
-                    className={`p-3 rounded-xl border text-xs flex items-center justify-between cursor-pointer transition ${
-                      isAssigned ? "bg-sky-50 border-sky-300" : "bg-slate-50 border-slate-200"
-                    }`}
+                    className={`p-3 rounded-xl border text-xs flex items-center justify-between cursor-pointer transition ${isAssigned ? "bg-sky-50 border-sky-300" : "bg-slate-50 border-slate-200"
+                      }`}
                   >
                     <div>
                       <div className="font-bold text-slate-800">{role.name}</div>

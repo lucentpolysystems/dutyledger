@@ -1,11 +1,11 @@
-const express = require("express");
-const {
+import express from "express";
+import {
   getTodayAttendance,
   markAttendance,
   getAllAttendance,
   getAllAttendanceByMonthofuser,
   getAllAttendanceByMonth,
-} = require("./attendance.controller");
+} from "./attendance.controller.js";
 
 const router = express.Router();
 
@@ -15,4 +15,4 @@ router.get("/all-attendance", getAllAttendance);
 router.get("/getAllAttendanceByMonthofuser/:userId/:month", getAllAttendanceByMonthofuser);
 router.get("/all-attendance-by-month/:month", getAllAttendanceByMonth);
 
-module.exports = router;
+export default router;

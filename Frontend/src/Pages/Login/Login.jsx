@@ -89,12 +89,12 @@ const Login = () => {
         <div className="flex items-center gap-3.5">
           <img
             src="/logo.jpg"
-            alt="Lucent Polysystem Pvt. Ltd."
+            alt="Lucent PolySystems Pvt. Ltd."
             className="h-12 w-auto object-contain rounded-lg shadow-sm"
           />
           <div className="flex flex-col">
             <span className="font-extrabold text-lg text-slate-900 leading-tight">
-              Lucent Polysystem
+              Lucent PolySystems
             </span>
             <span className="text-xs font-semibold text-sky-600 uppercase tracking-wider">
               Pvt. Ltd.
@@ -105,9 +105,7 @@ const Login = () => {
         {/* Center: Sign-In Form */}
         <div className="my-8 max-w-md w-full mx-auto">
           <div className="mb-6">
-            <span className="inline-block px-2.5 py-1 text-xs font-bold text-sky-700 bg-sky-50 border border-sky-200 rounded-md mb-2">
-              Corporate HR & Attendance Portal
-            </span>
+
             <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
               Sign In
             </h1>
@@ -183,8 +181,8 @@ const Login = () => {
               type="submit"
               disabled={loading}
               className={`w-full py-3 px-4 rounded-lg font-bold text-white text-sm shadow-md transition-all flex items-center justify-center gap-2 ${loading
-                  ? "bg-sky-400 cursor-not-allowed"
-                  : "bg-sky-600 hover:bg-sky-700 active:scale-[0.99]"
+                ? "bg-sky-400 cursor-not-allowed"
+                : "bg-sky-600 hover:bg-sky-700 active:scale-[0.99]"
                 }`}
             >
               {loading && (
@@ -217,7 +215,7 @@ const Login = () => {
 
         {/* Footer */}
         <div className="text-center text-xs text-slate-400 pt-4 border-t border-slate-100">
-          © {new Date().getFullYear()} Lucent Polysystem Pvt. Ltd. • All Rights Reserved
+          © {new Date().getFullYear()} Lucent PolySystems Pvt. Ltd. • All Rights Reserved
         </div>
       </div>
 
@@ -242,18 +240,18 @@ const Login = () => {
           <div className="inline-block p-4 rounded-2xl bg-white shadow-xl border border-white/20">
             <img
               src="/logo.jpg"
-              alt="Lucent Polysystem Pvt. Ltd."
+              alt="Lucent PolySystems Pvt. Ltd."
               className="h-16 w-auto object-contain"
             />
           </div>
 
           <h2 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
-            Lucent Polysystem <br />
+            Lucent PolySystems <br />
             <span className="text-sky-400">Pvt. Ltd.</span>
           </h2>
 
           <p className="text-slate-300 text-sm leading-relaxed">
-            Welcome to the centralized internal portal for Lucent Polysystem Pvt. Ltd. Manage attendance tracking, geofenced punch-ins, salary and payroll disbursements, leaves, and HR communications seamlessly in one place.
+            Welcome to the centralized internal portal for Lucent PolySystems Pvt. Ltd.
           </p>
 
 

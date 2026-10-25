@@ -1,5 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcrypt');
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -11,7 +11,7 @@ const initialUsers = [
     joiningDate: new Date().toISOString().split("T")[0],
     designation: "HR Manager",
     department: "Human Resources",
-    address: "Lucent Polysystem Pvt. Ltd., Corporate Office",
+    address: "Lucent PolySystems Pvt. Ltd., Corporate Office",
     bankAccount: "123456789012",
     mobile: "9876543210",
     email: "admin@example.com",
@@ -32,7 +32,7 @@ const initialUsers = [
     joiningDate: new Date().toISOString().split("T")[0],
     designation: "Polymer Production Engineer",
     department: "Engineering",
-    address: "Lucent Polysystem Pvt. Ltd., Plant Staff Quarters",
+    address: "Lucent PolySystems Pvt. Ltd., Plant Staff Quarters",
     bankAccount: "987654321098",
     mobile: "9123456780",
     email: "employee@example.com",
@@ -49,7 +49,7 @@ const initialUsers = [
 ];
 
 async function main() {
-  console.log("🌱 Seeding initial PostgreSQL data for Lucent Polysystem...");
+  console.log("🌱 Seeding initial PostgreSQL data for Lucent PolySystems...");
 
   for (const user of initialUsers) {
     const { plainPassword, ...userData } = user;

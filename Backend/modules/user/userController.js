@@ -1,7 +1,6 @@
-const { getDB } = require('../../config/db');
-const { ObjectId } = require('mongodb');
-const jwt = require("jsonwebtoken");
-const transporter = require("../mail/mailtransporter");
+import { getDB } from '../../config/db.js';
+import jwt from "jsonwebtoken";
+import transporter from "../mail/mailtransporter.js";
 
 const getProfile = async (req, res) => {
   const db = getDB();
@@ -9,10 +8,8 @@ const getProfile = async (req, res) => {
   if (!req.user || !req.user.userId)
     return res.status(400).json({ message: 'Invalid user' });
 
-  const user = await db.collection('users').findOne(
-    { _id: new ObjectId(req.user.user_id) },
-    { projection: { password: 0 } }
-  );
+  const targetId = req.user.user_id || req.user.userId;
+  const user = await db.collection('users').findOne({ user_id: targetId });
 
   if (!user) return res.status(404).json({ message: 'User not found' });
 
@@ -135,12 +132,12 @@ const addUser = async (req, res) => {
     const setPasswordLink = `${process.env.FRONTEND_URL}/${id}/set-password?token=${token}`;
 
     await transporter.sendMail({
-      from: `"Lucent Polysystem Pvt. Ltd." <${process.env.SMTP_EMAIL}>`,
+      from: `"Lucent PolySystems Pvt. Ltd." <${process.env.SMTP_EMAIL}>`,
       to: email,
-      subject: "Welcome to Lucent Polysystem – Set Your Password",
+      subject: "Welcome to Lucent PolySystems – Set Your Password",
       html: `
         <p>Hello <strong>${name}</strong>,</p>
-        <p>Welcome to <strong>Lucent Polysystem Pvt. Ltd.</strong>! Your HR account has been created in the Attendance & Payroll system.</p>
+        <p>Welcome to <strong>Lucent PolySystems Pvt. Ltd.</strong>! Your HR account has been created in the Attendance & Payroll system.</p>
         <p>Click the link below to set your password (valid for 1 hour):</p>
         <a href="${setPasswordLink}">${setPasswordLink}</a>
         <p>Please review your details below:</p>
@@ -162,7 +159,7 @@ const addUser = async (req, res) => {
         <br /><br />
         <p>If any of these details are incorrect, please contact the HR team at ${process.env.HR_EMAIL}</p>
         <p>Thank you!</p>
-        <p>Best regards,<br><strong>Lucent Polysystem Pvt. Ltd. HR Team</strong></p>
+        <p>Best regards,<br><strong>Lucent PolySystems Pvt. Ltd. HR Team</strong></p>
       `,
     });
 
@@ -172,8 +169,8 @@ const addUser = async (req, res) => {
       userId: result.insertedId,
     });
   } catch (error) {
-  console.error("❌ Error adding user:", error); // <- This will log the exact problem
-  res.status(500).json({ message: "Internal Server Error", error: error.message });
+    console.error("❌ Error adding user:", error); // <- This will log the exact problem
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
 
@@ -208,24 +205,15 @@ const userByitsId = async (req, res) => {
   const db = getDB();
   const { userid } = req.params;
   try {
-    const { ObjectId } = require('mongodb');
-    let query = { user_id: userid };
-    if (ObjectId.isValid(userid) && userid.length === 24) {
-      query = { $or: [{ user_id: userid }, { _id: new ObjectId(userid) }] };
-    }
-
-    const user = await db.collection('users').findOne(
-      query,
-      { projection: { password: 0 } }
-    );
+    const user = await db.collection('users').findOne({ user_id: userid });
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.status(200).json({ message: 'User fetched successfully', user });
   }
-  catch(error){
+  catch (error) {
     console.error('Error fetching user by ID:', error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
-}
+};
 
-
-module.exports = { getProfile, addUser, alluser,userByitsId,updateProfile};
+export { getProfile, addUser, alluser, userByitsId, updateProfile };
+export default { getProfile, addUser, alluser, userByitsId, updateProfile };

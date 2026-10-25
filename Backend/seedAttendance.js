@@ -1,6 +1,12 @@
-const { MongoClient } = require("mongodb");
-const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, "auth.env") });
+import { MongoClient } from "mongodb";
+import path from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, "auth.env") });
+dotenv.config();
 
 const mongoURI = process.env.MONGO_URI;
 const dbName = "Attendance";

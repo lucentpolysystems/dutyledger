@@ -199,7 +199,7 @@ const SettingsPage = () => {
   // 2. HR & COMPANY POLICIES (HR & Super Admin)
   // -------------------------------------------------------------
   const defaultCompanySettings = {
-    companyName: "Lucent Polysystem Pvt. Ltd.",
+    companyName: "Lucent PolySystems Pvt. Ltd.",
     cin: "U25209GJ2018PTC104523",
     gstin: "24AAACL5890P1ZB",
     corporateEmail: "hr@lucentpolysystem.com",
@@ -319,11 +319,11 @@ const SettingsPage = () => {
       return saved
         ? JSON.parse(saved)
         : {
-            payrollUpdates: true,
-            attendanceReminders: true,
-            announcements: true,
-            leaveStatusAlerts: true,
-          };
+          payrollUpdates: true,
+          attendanceReminders: true,
+          announcements: true,
+          leaveStatusAlerts: true,
+        };
     } catch {
       return {
         payrollUpdates: true,
@@ -527,7 +527,7 @@ const SettingsPage = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
         <div>
           <div className="flex items-center gap-2 text-xs font-bold text-sky-600 uppercase tracking-wider mb-1">
-            <Building2 className="w-4 h-4" /> Lucent Polysystem Pvt. Ltd.
+            <Building2 className="w-4 h-4" /> Lucent PolySystems Pvt. Ltd.
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             {roleMeta.title}
@@ -571,11 +571,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("company")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "company"
-                    ? "bg-amber-50 text-amber-900 font-bold border border-amber-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "company"
+                  ? "bg-amber-50 text-amber-900 font-bold border border-amber-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <Building2 className="w-4 h-4 shrink-0 text-amber-600" />
                 <span>Company Profile</span>
@@ -583,11 +582,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("system-security")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "system-security"
-                    ? "bg-amber-50 text-amber-900 font-bold border border-amber-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "system-security"
+                  ? "bg-amber-50 text-amber-900 font-bold border border-amber-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <Shield className="w-4 h-4 shrink-0 text-indigo-600" />
                 <span>Platform Security</span>
@@ -595,11 +593,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("geofence")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "geofence"
-                    ? "bg-amber-50 text-amber-900 font-bold border border-amber-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "geofence"
+                  ? "bg-amber-50 text-amber-900 font-bold border border-amber-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <Radio className="w-4 h-4 shrink-0 text-sky-600" />
                 <span>Plant Geofencing</span>
@@ -607,11 +604,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("payroll-policy")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "payroll-policy"
-                    ? "bg-amber-50 text-amber-900 font-bold border border-amber-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "payroll-policy"
+                  ? "bg-amber-50 text-amber-900 font-bold border border-amber-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <DollarSign className="w-4 h-4 shrink-0 text-emerald-600" />
                 <span>Payroll & Tax Rules</span>
@@ -619,11 +615,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("leave-policy")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "leave-policy"
-                    ? "bg-amber-50 text-amber-900 font-bold border border-amber-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "leave-policy"
+                  ? "bg-amber-50 text-amber-900 font-bold border border-amber-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <Calendar className="w-4 h-4 shrink-0 text-orange-600" />
                 <span>Leave & Holidays</span>
@@ -631,11 +626,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("audit-policy")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "audit-policy"
-                    ? "bg-amber-50 text-amber-900 font-bold border border-amber-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "audit-policy"
+                  ? "bg-amber-50 text-amber-900 font-bold border border-amber-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <History className="w-4 h-4 shrink-0 text-rose-600" />
                 <span>Audit & RBAC Rules</span>
@@ -643,11 +637,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("email-dispatch")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "email-dispatch"
-                    ? "bg-amber-50 text-amber-900 font-bold border border-amber-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "email-dispatch"
+                  ? "bg-amber-50 text-amber-900 font-bold border border-amber-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <Mail className="w-4 h-4 shrink-0 text-cyan-600" />
                 <span>Email & Broadcasts</span>
@@ -664,11 +657,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("system-security")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "system-security"
-                    ? "bg-indigo-50 text-indigo-900 font-bold border border-indigo-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "system-security"
+                  ? "bg-indigo-50 text-indigo-900 font-bold border border-indigo-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <Shield className="w-4 h-4 shrink-0 text-indigo-600" />
                 <span>IT Security & Session</span>
@@ -676,11 +668,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("geofence")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "geofence"
-                    ? "bg-indigo-50 text-indigo-900 font-bold border border-indigo-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "geofence"
+                  ? "bg-indigo-50 text-indigo-900 font-bold border border-indigo-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <Radio className="w-4 h-4 shrink-0 text-sky-600" />
                 <span>Office GPS & Geofence</span>
@@ -688,11 +679,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("audit-policy")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "audit-policy"
-                    ? "bg-indigo-50 text-indigo-900 font-bold border border-indigo-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "audit-policy"
+                  ? "bg-indigo-50 text-indigo-900 font-bold border border-indigo-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <History className="w-4 h-4 shrink-0 text-rose-600" />
                 <span>Audit & RBAC Retentions</span>
@@ -700,11 +690,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("email-dispatch")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "email-dispatch"
-                    ? "bg-indigo-50 text-indigo-900 font-bold border border-indigo-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "email-dispatch"
+                  ? "bg-indigo-50 text-indigo-900 font-bold border border-indigo-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <Mail className="w-4 h-4 shrink-0 text-cyan-600" />
                 <span>SMTP & Notification Gateway</span>
@@ -721,11 +710,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("company")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "company"
-                    ? "bg-sky-50 text-sky-900 font-bold border border-sky-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "company"
+                  ? "bg-sky-50 text-sky-900 font-bold border border-sky-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <Building2 className="w-4 h-4 shrink-0 text-sky-600" />
                 <span>Company Legal Profile</span>
@@ -733,11 +721,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("shifts")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "shifts"
-                    ? "bg-sky-50 text-sky-900 font-bold border border-sky-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "shifts"
+                  ? "bg-sky-50 text-sky-900 font-bold border border-sky-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <Clock className="w-4 h-4 shrink-0 text-indigo-600" />
                 <span>Work Hours & Grace Period</span>
@@ -745,11 +732,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("payroll-policy")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "payroll-policy"
-                    ? "bg-sky-50 text-sky-900 font-bold border border-sky-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "payroll-policy"
+                  ? "bg-sky-50 text-sky-900 font-bold border border-sky-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <DollarSign className="w-4 h-4 shrink-0 text-emerald-600" />
                 <span>Payroll & Statutory Rules</span>
@@ -757,11 +743,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("leave-policy")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "leave-policy"
-                    ? "bg-sky-50 text-sky-900 font-bold border border-sky-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "leave-policy"
+                  ? "bg-sky-50 text-sky-900 font-bold border border-sky-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <Calendar className="w-4 h-4 shrink-0 text-amber-600" />
                 <span>Leave Quotas & Holidays</span>
@@ -769,11 +754,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("email-dispatch")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "email-dispatch"
-                    ? "bg-sky-50 text-sky-900 font-bold border border-sky-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "email-dispatch"
+                  ? "bg-sky-50 text-sky-900 font-bold border border-sky-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <Mail className="w-4 h-4 shrink-0 text-cyan-600" />
                 <span>Staff Email Dispatch</span>
@@ -790,11 +774,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("dept-shifts")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "dept-shifts"
-                    ? "bg-teal-50 text-teal-900 font-bold border border-teal-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "dept-shifts"
+                  ? "bg-teal-50 text-teal-900 font-bold border border-teal-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <Clock className="w-4 h-4 shrink-0 text-teal-600" />
                 <span>Shift Rosters & Schedules</span>
@@ -802,11 +785,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("dept-approvals")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "dept-approvals"
-                    ? "bg-teal-50 text-teal-900 font-bold border border-teal-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "dept-approvals"
+                  ? "bg-teal-50 text-teal-900 font-bold border border-teal-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <FileCheck className="w-4 h-4 shrink-0 text-indigo-600" />
                 <span>Leave & Overtime Limits</span>
@@ -823,11 +805,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("team-alerts")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "team-alerts"
-                    ? "bg-purple-50 text-purple-900 font-bold border border-purple-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "team-alerts"
+                  ? "bg-purple-50 text-purple-900 font-bold border border-purple-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <AlertTriangle className="w-4 h-4 shrink-0 text-purple-600" />
                 <span>Attendance & Late Alerts</span>
@@ -835,11 +816,10 @@ const SettingsPage = () => {
 
               <button
                 onClick={() => setActiveTab("team-roster")}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  activeTab === "team-roster"
-                    ? "bg-purple-50 text-purple-900 font-bold border border-purple-200 shadow-2xs"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "team-roster"
+                  ? "bg-purple-50 text-purple-900 font-bold border border-purple-200 shadow-2xs"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
               >
                 <History className="w-4 h-4 shrink-0 text-indigo-600" />
                 <span>Shift Handover Logs</span>
@@ -854,11 +834,10 @@ const SettingsPage = () => {
 
           <button
             onClick={() => setActiveTab("profile")}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-              activeTab === "profile"
-                ? "bg-slate-100 text-slate-900 font-bold border border-slate-300 shadow-2xs"
-                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-            }`}
+            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "profile"
+              ? "bg-slate-100 text-slate-900 font-bold border border-slate-300 shadow-2xs"
+              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              }`}
           >
             <User className="w-4 h-4 shrink-0 text-slate-600" />
             <span>Personal Profile</span>
@@ -868,11 +847,10 @@ const SettingsPage = () => {
           {!isAdmin && !isSuperAdmin && (
             <button
               onClick={() => setActiveTab("employment")}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                activeTab === "employment"
-                  ? "bg-slate-100 text-slate-900 font-bold border border-slate-300 shadow-2xs"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-              }`}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "employment"
+                ? "bg-slate-100 text-slate-900 font-bold border border-slate-300 shadow-2xs"
+                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                }`}
             >
               <Briefcase className="w-4 h-4 shrink-0 text-sky-600" />
               <span>Workplace Record</span>
@@ -881,11 +859,10 @@ const SettingsPage = () => {
 
           <button
             onClick={() => setActiveTab("security")}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-              activeTab === "security"
-                ? "bg-slate-100 text-slate-900 font-bold border border-slate-300 shadow-2xs"
-                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-            }`}
+            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "security"
+              ? "bg-slate-100 text-slate-900 font-bold border border-slate-300 shadow-2xs"
+              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              }`}
           >
             <Lock className="w-4 h-4 shrink-0 text-rose-600" />
             <span>Account Security</span>
@@ -895,11 +872,10 @@ const SettingsPage = () => {
           {!isAdmin && !isSuperAdmin && (
             <button
               onClick={() => setActiveTab("notifications")}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                activeTab === "notifications"
-                  ? "bg-slate-100 text-slate-900 font-bold border border-slate-300 shadow-2xs"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-              }`}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${activeTab === "notifications"
+                ? "bg-slate-100 text-slate-900 font-bold border border-slate-300 shadow-2xs"
+                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                }`}
             >
               <Bell className="w-4 h-4 shrink-0 text-amber-600" />
               <span>Personal Alerts</span>
@@ -928,7 +904,7 @@ const SettingsPage = () => {
                 <div>
                   <h2 className="text-xl font-bold text-slate-900">Company & Organization Profile</h2>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Official registration, addresses, and corporate details for Lucent Polysystem Pvt. Ltd.
+                    Official registration, addresses, and corporate details for Lucent PolySystems Pvt. Ltd.
                   </p>
                 </div>
                 <img src="/logo.jpg" alt="Logo" className="h-9 w-auto object-contain rounded" />
@@ -1547,7 +1523,7 @@ const SettingsPage = () => {
                 <div>
                   <h2 className="text-xl font-bold text-slate-900">Email & Broadcast Automation</h2>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Control which automated notifications Lucent Polysystem dispatches to staff members.
+                    Control which automated notifications Lucent PolySystems dispatches to staff members.
                   </p>
                 </div>
                 <div className="p-2 bg-cyan-50 border border-cyan-200 rounded-lg">
@@ -2077,7 +2053,7 @@ const SettingsPage = () => {
                 <div>
                   <h2 className="text-xl font-bold text-slate-900">My Employment Record</h2>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Official workplace parameters verified by Lucent Polysystem HR administration.
+                    Official workplace parameters verified by Lucent PolySystems HR administration.
                   </p>
                 </div>
                 <img src="/logo.jpg" alt="Lucent Logo" className="h-8 w-auto object-contain rounded" />
@@ -2086,7 +2062,7 @@ const SettingsPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
                   <div className="text-xs font-bold uppercase text-slate-400 mb-1">Company / Employer</div>
-                  <div className="text-base font-extrabold text-slate-900">Lucent Polysystem Pvt. Ltd.</div>
+                  <div className="text-base font-extrabold text-slate-900">Lucent PolySystems Pvt. Ltd.</div>
                   <div className="text-xs text-slate-500 mt-0.5">Sanand Plant & Industrial Facility</div>
                 </div>
 

@@ -1,7 +1,7 @@
-const express = require("express");
-const authenticateToken = require("../../middlewares/authMiddleware");
-const { requirePermission } = require("../../middlewares/rbacMiddleware");
-const {
+import express from "express";
+import authenticateToken from "../../middlewares/authMiddleware.js";
+import { requirePermission } from "../../middlewares/rbacMiddleware.js";
+import {
   getAllRoles,
   createRole,
   updateRole,
@@ -10,7 +10,7 @@ const {
   getUsersWithRoles,
   assignUserRoles,
   getAuditLogs,
-} = require("./rbacController");
+} from "./rbacController.js";
 
 const router = express.Router();
 
@@ -30,4 +30,4 @@ router.put("/users/:userId/roles", authenticateToken, requirePermission("rbac:us
 // Audit Logs
 router.get("/audit-logs", authenticateToken, requirePermission("audit:read:all", "audit:logs:read"), getAuditLogs);
 
-module.exports = router;
+export default router;

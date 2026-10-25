@@ -1,13 +1,12 @@
-const cloudinary = require("../../config/cloudinary");
-const streamifier = require("streamifier");
-const { getDB } = require("../../config/db");
-// const { ObjectId } = require("mongodb");
+import cloudinary from "../../config/cloudinary.js";
+import streamifier from "streamifier";
+import { getDB } from "../../config/db.js";
 
-exports.uploadProfilePic = async (req, res) => {
+export const uploadProfilePic = async (req, res) => {
   const user_id = req.body.user_id;
   console.log("Received user_id:", user_id);
 
-  if ( !user_id) {
+  if (!user_id || !req.file) {
     return res.status(400).json({ message: "Missing file or userId" });
   }
 
@@ -21,10 +20,8 @@ exports.uploadProfilePic = async (req, res) => {
 
       const db = getDB();
       const update = await db.collection("users").updateOne(
-        // If using MongoDB ObjectId:
-        // { _id: new ObjectId(user_id) },
         { user_id: user_id },
-        { $set: { profilePic: result.secure_url } }
+        { $set: { profileImage: result.secure_url, profilePic: result.secure_url } }
       );
 
       if (update.modifiedCount === 1) {
@@ -37,3 +34,5 @@ exports.uploadProfilePic = async (req, res) => {
 
   streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
 };
+
+export default { uploadProfilePic };

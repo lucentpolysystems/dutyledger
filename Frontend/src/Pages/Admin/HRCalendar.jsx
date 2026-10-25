@@ -182,7 +182,7 @@ const HRCalendar = () => {
             HR Attendance & Holiday Calendar
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Lucent Polysystem Pvt. Ltd. • Track employee daily punch in/out times and schedule holidays
+            Lucent PolySystems Pvt. Ltd. • Track employee daily punch in/out times and schedule holidays
           </p>
         </div>
 
@@ -361,10 +361,9 @@ const HRCalendar = () => {
                   {attendance ? (
                     <span
                       className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded tracking-wider
-                        ${
-                          attendance.status === "Present"
-                            ? "bg-emerald-100 text-emerald-800"
-                            : attendance.status === "Late"
+                        ${attendance.status === "Present"
+                          ? "bg-emerald-100 text-emerald-800"
+                          : attendance.status === "Late"
                             ? "bg-amber-100 text-amber-800"
                             : "bg-orange-100 text-orange-800"
                         }
@@ -394,10 +393,9 @@ const HRCalendar = () => {
                       {/* Check-Out Time */}
                       <div
                         className={`flex items-center gap-1 text-[11px] font-bold px-1.5 py-0.5 rounded
-                          ${
-                            attendance.out_time
-                              ? "text-indigo-700 bg-indigo-50"
-                              : "text-amber-700 bg-amber-50 animate-pulse"
+                          ${attendance.out_time
+                            ? "text-indigo-700 bg-indigo-50"
+                            : "text-amber-700 bg-amber-50 animate-pulse"
                           }
                         `}
                       >
@@ -531,18 +529,17 @@ const HRCalendar = () => {
                 <span className="text-xs font-semibold text-slate-500">Day Status</span>
                 <span
                   className={`text-xs font-bold uppercase px-2.5 py-1 rounded-md
-                    ${
-                      selectedDayData.attendance?.status === "Present"
-                        ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                        : selectedDayData.attendance?.status === "Late"
+                    ${selectedDayData.attendance?.status === "Present"
+                      ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                      : selectedDayData.attendance?.status === "Late"
                         ? "bg-amber-100 text-amber-800 border border-amber-300"
                         : selectedDayData.attendance?.status === "Half Day"
-                        ? "bg-orange-100 text-orange-800 border border-orange-300"
-                        : selectedDayData.isHoliday
-                        ? "bg-purple-100 text-purple-800 border border-purple-300"
-                        : selectedDayData.isSunday
-                        ? "bg-rose-100 text-rose-800 border border-rose-300"
-                        : "bg-slate-200 text-slate-700"
+                          ? "bg-orange-100 text-orange-800 border border-orange-300"
+                          : selectedDayData.isHoliday
+                            ? "bg-purple-100 text-purple-800 border border-purple-300"
+                            : selectedDayData.isSunday
+                              ? "bg-rose-100 text-rose-800 border border-rose-300"
+                              : "bg-slate-200 text-slate-700"
                     }
                   `}
                 >
@@ -550,8 +547,8 @@ const HRCalendar = () => {
                     (selectedDayData.isHoliday
                       ? "Company Holiday"
                       : selectedDayData.isSunday
-                      ? "Weekly Off"
-                      : "Absent / No Record")}
+                        ? "Weekly Off"
+                        : "Absent / No Record")}
                 </span>
               </div>
 
@@ -598,11 +595,10 @@ const HRCalendar = () => {
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-500 font-medium">Punctuality Score:</span>
                     <span
-                      className={`font-bold ${
-                        selectedDayData.attendance.status === "Present"
-                          ? "text-emerald-600"
-                          : "text-amber-600"
-                      }`}
+                      className={`font-bold ${selectedDayData.attendance.status === "Present"
+                        ? "text-emerald-600"
+                        : "text-amber-600"
+                        }`}
                     >
                       {selectedDayData.attendance.status === "Present" ? "On Time" : "Grace Period"}
                     </span>

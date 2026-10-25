@@ -239,7 +239,7 @@ const Attendance = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-200">
         <div>
           <div className="flex items-center gap-2 text-xs font-bold text-sky-600 uppercase tracking-wider mb-1">
-            <Building2 className="w-4 h-4" /> Lucent Polysystem Pvt. Ltd. • Sanand Plant Facility
+            <Building2 className="w-4 h-4" /> Lucent PolySystems Pvt. Ltd. • Sanand Plant Facility
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Daily Attendance & Shift Punch
@@ -269,18 +269,16 @@ const Attendance = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* CHECK-IN CARD (PUNCH IN) */}
         <div
-          className={`rounded-2xl border p-6 transition-all shadow-xs relative overflow-hidden ${
-            isCheckedIn
-              ? "bg-emerald-50/50 border-emerald-200"
-              : "bg-white border-slate-200 hover:border-sky-300"
-          }`}
+          className={`rounded-2xl border p-6 transition-all shadow-xs relative overflow-hidden ${isCheckedIn
+            ? "bg-emerald-50/50 border-emerald-200"
+            : "bg-white border-slate-200 hover:border-sky-300"
+            }`}
         >
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div
-                className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold ${
-                  isCheckedIn ? "bg-emerald-600 text-white shadow-sm" : "bg-sky-100 text-sky-700"
-                }`}
+                className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold ${isCheckedIn ? "bg-emerald-600 text-white shadow-sm" : "bg-sky-100 text-sky-700"
+                  }`}
               >
                 <LogIn className="w-6 h-6" />
               </div>
@@ -310,13 +308,12 @@ const Attendance = () => {
             <div className="flex items-center justify-between text-sm py-2 px-3 rounded-lg bg-white/70 border border-slate-200/60">
               <span className="text-slate-500 font-medium">Arrival Status:</span>
               <span
-                className={`font-bold px-2 py-0.5 rounded text-xs ${
-                  todayData.status === "Present"
-                    ? "bg-emerald-100 text-emerald-800"
-                    : todayData.status === "Late"
+                className={`font-bold px-2 py-0.5 rounded text-xs ${todayData.status === "Present"
+                  ? "bg-emerald-100 text-emerald-800"
+                  : todayData.status === "Late"
                     ? "bg-amber-100 text-amber-800"
                     : "bg-slate-100 text-slate-600"
-                }`}
+                  }`}
               >
                 {todayData.status}
               </span>
@@ -345,24 +342,22 @@ const Attendance = () => {
 
         {/* CHECK-OUT CARD (PUNCH OUT) */}
         <div
-          className={`rounded-2xl border p-6 transition-all shadow-xs relative overflow-hidden ${
-            isCheckedOut
-              ? "bg-sky-50/50 border-sky-200"
-              : isCheckedIn
+          className={`rounded-2xl border p-6 transition-all shadow-xs relative overflow-hidden ${isCheckedOut
+            ? "bg-sky-50/50 border-sky-200"
+            : isCheckedIn
               ? "bg-amber-50/40 border-amber-200"
               : "bg-slate-50 border-slate-200 opacity-90"
-          }`}
+            }`}
         >
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div
-                className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold ${
-                  isCheckedOut
-                    ? "bg-sky-600 text-white shadow-sm"
-                    : isCheckedIn
+                className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold ${isCheckedOut
+                  ? "bg-sky-600 text-white shadow-sm"
+                  : isCheckedIn
                     ? "bg-amber-500 text-white"
                     : "bg-slate-200 text-slate-500"
-                }`}
+                  }`}
               >
                 <LogOut className="w-6 h-6" />
               </div>
@@ -474,15 +469,14 @@ const Attendance = () => {
           <div className="text-xs font-bold text-slate-400 uppercase">Official Status</div>
           <div className="text-lg font-extrabold text-slate-900 mt-1 flex items-center gap-1.5">
             <span
-              className={`inline-block w-2.5 h-2.5 rounded-full ${
-                todayData.status === "Present"
-                  ? "bg-emerald-500"
-                  : todayData.status === "Late"
+              className={`inline-block w-2.5 h-2.5 rounded-full ${todayData.status === "Present"
+                ? "bg-emerald-500"
+                : todayData.status === "Late"
                   ? "bg-amber-500"
                   : todayData.status === "Half Day"
-                  ? "bg-purple-500"
-                  : "bg-slate-400"
-              }`}
+                    ? "bg-purple-500"
+                    : "bg-slate-400"
+                }`}
             />
             {todayData.status}
           </div>
@@ -628,15 +622,14 @@ const Attendance = () => {
                       </td>
                       <td className="py-3 px-3">
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                            rec.status === "Present"
-                              ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                              : rec.status === "Late"
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${rec.status === "Present"
+                            ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                            : rec.status === "Late"
                               ? "bg-amber-100 text-amber-800 border border-amber-200"
                               : rec.status === "Half Day"
-                              ? "bg-purple-100 text-purple-800 border border-purple-200"
-                              : "bg-rose-100 text-rose-800 border border-rose-200"
-                          }`}
+                                ? "bg-purple-100 text-purple-800 border border-purple-200"
+                                : "bg-rose-100 text-rose-800 border border-rose-200"
+                            }`}
                         >
                           {rec.status || "Present"}
                         </span>
