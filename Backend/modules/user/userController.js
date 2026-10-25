@@ -2,6 +2,17 @@ import jwt from "jsonwebtoken";
 import { prisma } from '../../config/db.js';
 import transporter from "../mail/mailtransporter.js";
 
+const formatUserResponse = (u) => {
+  if (!u) return null;
+  return {
+    ...u,
+    user_id: u.userId,
+    joigningDate: u.joiningDate,
+    IFSC: u.ifsc,
+    emergencyContactname: u.emergencyContactName,
+  };
+};
+
 const getProfile = async (req, res) => {
   try {
     if (!req.user || !req.user.userId) {
@@ -29,13 +40,13 @@ const getProfile = async (req, res) => {
         mobile: true,
         address: true,
         bankAccount: true,
-        IFSC: true,
+        ifsc: true,
         emergencyContact: true,
-        emergencyContactname: true,
+        emergencyContactName: true,
         employmentType: true,
         attendanceType: true,
         salary: true,
-        joigningDate: true,
+        joiningDate: true,
         reportingTo: true,
         createdAt: true,
       },
@@ -43,7 +54,7 @@ const getProfile = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    res.json({ user });
+    res.json({ user: formatUserResponse(user) });
   } catch (error) {
     console.error("Error fetching profile:", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -62,8 +73,10 @@ const updateProfile = async (req, res) => {
     bankAccount,
     gender,
     IFSC,
+    ifsc,
     emergencyContact,
     emergencyContactname,
+    emergencyContactName,
   } = req.body;
 
   const data = {};
@@ -73,9 +86,11 @@ const updateProfile = async (req, res) => {
   if (address !== undefined) data.address = String(address).trim();
   if (bankAccount !== undefined) data.bankAccount = String(bankAccount).trim();
   if (gender !== undefined) data.gender = String(gender).trim();
-  if (IFSC !== undefined) data.IFSC = String(IFSC).trim();
+  if (ifsc !== undefined || IFSC !== undefined) data.ifsc = String(ifsc || IFSC).trim();
   if (emergencyContact !== undefined) data.emergencyContact = String(emergencyContact).trim();
-  if (emergencyContactname !== undefined) data.emergencyContactname = String(emergencyContactname).trim();
+  if (emergencyContactName !== undefined || emergencyContactname !== undefined) {
+    data.emergencyContactName = String(emergencyContactName || emergencyContactname).trim();
+  }
 
   try {
     if (Object.keys(data).length === 0) {
@@ -114,6 +129,7 @@ const addUser = async (req, res) => {
       gender,
       id,
       joigningDate,
+      joiningDate,
       designation,
       address,
       bankAccount,
@@ -125,7 +141,9 @@ const addUser = async (req, res) => {
       attendanceType,
       emergencyContact,
       emergencyContactname,
+      emergencyContactName,
       IFSC,
+      ifsc,
     } = req.body;
 
     // ✅ Required Fields Check
@@ -162,19 +180,19 @@ const addUser = async (req, res) => {
         username: String(name).trim(),
         userId: cleanId,
         gender: gender ? String(gender) : null,
-        joigningDate: joigningDate ? String(joigningDate) : null,
+        joiningDate: joiningDate || joigningDate ? String(joiningDate || joigningDate) : null,
         designation: designation ? String(designation) : null,
         address: address ? String(address) : null,
         bankAccount: bankAccount ? String(bankAccount) : null,
         mobile: mobile ? String(mobile) : null,
         email: cleanEmail,
         role: String(role).toLowerCase(),
-        salary: salary ? Number(salary) : null,
-        employmentType: employmentType ? String(employmentType) : null,
-        attendanceType: attendanceType ? String(attendanceType) : null,
+        salary: salary ? Number(salary) : 0,
+        employmentType: employmentType ? String(employmentType) : "On Roll",
+        attendanceType: attendanceType ? String(attendanceType) : "Office",
         emergencyContact: emergencyContact ? String(emergencyContact) : null,
-        emergencyContactname: emergencyContactname ? String(emergencyContactname) : null,
-        IFSC: IFSC ? String(IFSC) : null,
+        emergencyContactName: emergencyContactName || emergencyContactname ? String(emergencyContactName || emergencyContactname) : null,
+        ifsc: ifsc || IFSC ? String(ifsc || IFSC) : null,
         password: null,
         passwordSetToken: token,
         tokenExpiry,
@@ -186,13 +204,16 @@ const addUser = async (req, res) => {
       const baseSalary = Number(salary);
       await prisma.salaryInfo.create({
         data: {
-          userId: cleanId,
-          basicSalary: Math.round(baseSalary * 0.5),
-          hra: Math.round(baseSalary * 0.3),
-          allowance: Math.round(baseSalary * 0.2),
-          pf: Math.round(baseSalary * 0.12),
-          taxDeduction: Math.round(baseSalary * 0.05),
-          netSalary: baseSalary - Math.round(baseSalary * 0.17),
+          employeeId: cleanId,
+          employeeName: String(name).trim(),
+          baseSalary: baseSalary,
+          hra: Math.round(baseSalary * 0.4),
+          bonus: 0,
+          taxPercent: 10,
+          pfPercent: 12,
+          paidLeavesAllowed: 2,
+          joiningDate: joiningDate || joigningDate || new Date().toISOString().split("T")[0],
+          updatedBy: "System Onboarding",
         },
       }).catch((e) => console.warn("Notice: could not initialize salaryInfo:", e.message));
     }
@@ -236,7 +257,16 @@ const alluser = async (req, res) => {
     // Data-level scoping if user has department or team level permissions
     if (req.user) {
       const perms = new Set(req.user.permissions || []);
-      const hasFullAccess = perms.has("employees:read:all") || perms.has("users:read:all") || (req.user.roles || []).includes("ROLE_SUPER_ADMIN") || (req.user.role || "").toLowerCase() === "hr" || (req.user.role || "").toLowerCase() === "admin";
+      const userRoles = req.user.roles || [];
+      const userRole = (req.user.role || "").toLowerCase();
+      const hasFullAccess =
+        perms.has("employees:read:all") ||
+        perms.has("users:read:all") ||
+        userRoles.includes("ROLE_SUPER_ADMIN") ||
+        userRoles.includes("ROLE_HR") ||
+        userRole === "hr" ||
+        userRole === "admin" ||
+        userRole === "super_admin";
 
       if (!hasFullAccess) {
         if (perms.has("employees:read:dept") && req.user.department) {
@@ -265,23 +295,28 @@ const alluser = async (req, res) => {
         mobile: true,
         address: true,
         bankAccount: true,
-        IFSC: true,
+        ifsc: true,
         emergencyContact: true,
-        emergencyContactname: true,
+        emergencyContactName: true,
         employmentType: true,
         attendanceType: true,
         salary: true,
-        joigningDate: true,
+        joiningDate: true,
         reportingTo: true,
         createdAt: true,
       },
       orderBy: { createdAt: "desc" },
     });
 
-    res.status(200).json({ message: "Users fetched successfully", users: users || [] });
+    const mappedUsers = users.map(formatUserResponse);
+
+    res.status(200).json({
+      message: "Users fetched successfully",
+      users: mappedUsers,
+    });
   } catch (error) {
     console.error("Error fetching users:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
 
@@ -308,20 +343,20 @@ const userByitsId = async (req, res) => {
         mobile: true,
         address: true,
         bankAccount: true,
-        IFSC: true,
+        ifsc: true,
         emergencyContact: true,
-        emergencyContactname: true,
+        emergencyContactName: true,
         employmentType: true,
         attendanceType: true,
         salary: true,
-        joigningDate: true,
+        joiningDate: true,
         reportingTo: true,
         createdAt: true,
       },
     });
 
     if (!user) return res.status(404).json({ message: 'User not found' });
-    res.status(200).json({ message: 'User fetched successfully', user });
+    res.status(200).json({ message: 'User fetched successfully', user: formatUserResponse(user) });
   } catch (error) {
     console.error('Error fetching user by ID:', error);
     res.status(500).json({ message: 'Internal Server Error' });

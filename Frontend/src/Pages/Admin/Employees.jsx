@@ -47,9 +47,9 @@ const Employees = () => {
   // ];
   const [employees, setEmployees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
- const navigate =useNavigate();
+  const navigate = useNavigate();
 
-useEffect(() => {
+  useEffect(() => {
     const fetchEmployees = async () => {
       try {
         const response = await fetch(apiUrl("/api/all"), {
@@ -59,7 +59,7 @@ useEffect(() => {
           throw new Error("Failed to fetch employees");
         }
         const data = await response.json();
-        setEmployees(data.users);
+        setEmployees(Array.isArray(data.users) ? data.users : []);
       } catch (error) {
         console.error("Error fetching employees:", error);
       }
@@ -67,11 +67,13 @@ useEffect(() => {
     fetchEmployees();
   }, []);
 
-  const filteredEmployees = employees.filter(emp =>
-  emp.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    emp.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    emp.user_id?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredEmployees = (employees || []).filter((emp) => {
+    const term = searchTerm.toLowerCase();
+    const id = (emp.user_id || emp.userId || "").toLowerCase();
+    const name = (emp.username || emp.name || "").toLowerCase();
+    const email = (emp.email || "").toLowerCase();
+    return name.includes(term) || email.includes(term) || id.includes(term);
+  });
   return (
     <div className="min-h-screen flex flex-col">
         <div className="flex-1 p-6 bg-gray-50">
@@ -112,38 +114,44 @@ useEffect(() => {
               </thead>
               <tbody>
                 {filteredEmployees.length > 0 ? (
-             filteredEmployees.map((emp, index) => (
-                  <tr
-                    key={index}
-                    className="border-t border-gray-200 hover:bg-gray-50 cursor-pointer"
-                    onClick={()=>navigate(`/admin/employees/${emp.user_id}`)}
-                  >
-                    <td className="px-6 py-4">{String(index + 1).padStart(2, "0")}</td>
-                    <td className="px-6 py-4">{emp.user_id}</td>
-                    <td className="px-6 py-4 flex items-center gap-3">
-                      {/* Avatar Circle with Icon */}
-                      <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="w-5 h-5 text-red-500"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5.121 17.804A7.975 7.975 0 0112 15c2.21 0 4.21.896 5.879 2.345M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                        </svg>
-                      </div>
-                      <span>{emp.username}</span>
-                    </td>
-                    <td className="px-6 py-4">{emp.designation}</td>
-                    <td className="px-6 py-4">{emp.employmentType}</td>
-                  </tr>
-                ))
+                  filteredEmployees.map((emp, index) => {
+                  const empId = emp.user_id || emp.userId || `emp-${index}`;
+                  return (
+                    <tr
+                      key={empId}
+                      className="border-t border-gray-200 hover:bg-gray-50 cursor-pointer"
+                      onClick={() => navigate(`/admin/employees/${empId}`)}
+                    >
+                      <td className="px-6 py-4">{String(index + 1).padStart(2, "0")}</td>
+                      <td className="px-6 py-4 font-mono font-medium text-slate-800">{empId}</td>
+                      <td className="px-6 py-4 flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-5 h-5 text-red-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5.121 17.804A7.975 7.975 0 0112 15c2.21 0 4.21.896 5.879 2.345M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                          </svg>
+                        </div>
+                        <span className="font-medium text-slate-900">{emp.username || emp.name}</span>
+                      </td>
+                      <td className="px-6 py-4 text-slate-600">{emp.designation || "Employee"}</td>
+                      <td className="px-6 py-4">
+                        <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                          {emp.employmentType || emp.employment_type || "On Roll"}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
         ) : (
             <tr>
         <td colSpan="5" className="text-center text-gray-500 h-16">
