@@ -27,7 +27,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'vendor-react': ['react', 'react-dom', 'react-router-dom', 'react-redux', '@reduxjs/toolkit'],
-          'vendor-ui': ['@mui/material', '@mui/icons-material', '@emotion/react', '@emotion/styled', 'framer-motion'],
+          'vendor-ui': ['@mui/material', '@mui/icons-material', '@emotion/react', '@emotion/styled', 'framer-motion', 'lucide-react'],
           'vendor-charts': ['recharts'],
           'vendor-pdf': ['jspdf'],
         },

@@ -3,22 +3,32 @@ import { BrowserRouter } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginUser } from "./Redux/Slice";
 import AppRoutes from "./routes/AppRoutes";
+import ErrorBoundary from "./Components/ErrorBoundary";
 
 function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = localStorage.getItem("token");
-    if (user && token) {
-      dispatch(loginUser({ user, token }));
+    try {
+      const storedUser = localStorage.getItem("user");
+      const token = localStorage.getItem("token");
+      if (storedUser && token) {
+        const user = JSON.parse(storedUser);
+        dispatch(loginUser({ user, token }));
+      }
+    } catch (err) {
+      console.warn("Failed to parse cached user session from localStorage:", err);
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
     }
   }, [dispatch]);
 
   return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 

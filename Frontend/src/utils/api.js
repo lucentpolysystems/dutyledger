@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const defaultBase = import.meta.env.DEV ? "http://localhost:4500" : "";
 const rawBaseUrl = import.meta.env.VITE_API_BASE_URL !== undefined
   ? import.meta.env.VITE_API_BASE_URL
@@ -19,3 +21,42 @@ export const authHeaders = (customToken) => {
   }
   return headers;
 };
+
+// Pre-configured Axios instance with centralized interceptors
+export const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Request Interceptor: automatically attach Authorization header
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token && !config.headers["Authorization"]) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response Interceptor: auto-logout on 401 Unauthorized
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      const currentPath = window.location.pathname;
+      if (currentPath !== "/" && !currentPath.includes("login") && !currentPath.includes("set-password")) {
+        console.warn("Session expired or unauthorized. Redirecting to login...");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default apiClient;
