@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { loginUser } from "../../Redux/Slice";
 import { toast, ToastContainer } from "react-toastify";
 import { apiUrl } from "../../utils/api";
-import { Lock, User, KeyRound, Sparkles, Clock, ShieldCheck, FileSpreadsheet, CheckCircle2 } from "lucide-react";
+import { Lock, User, KeyRound, Clock, ShieldCheck, FileSpreadsheet, CheckCircle2 } from "lucide-react";
 import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
@@ -21,17 +21,6 @@ const Login = () => {
     localStorage.removeItem("role");
   }, []);
 
-  const handleFillDemo = (roleType) => {
-    if (roleType === 'hr') {
-      setId('ADMIN001');
-      setUsername('Admin User');
-      setPassword('admin123');
-    } else {
-      setId('EMP001');
-      setUsername('John Doe');
-      setPassword('employee123');
-    }
-  };
 
   const handelLogin = async (e) => {
     e.preventDefault();
@@ -224,31 +213,6 @@ const Login = () => {
             </button>
           </form>
 
-          {/* Quick Demo Pre-fill helper */}
-          <div className="mt-6 pt-5 border-t border-slate-200">
-            <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold mb-2.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Quick Demo Login:
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() => handleFillDemo('hr')}
-                className="p-2 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 font-semibold text-left transition flex flex-col"
-              >
-                <span className="font-bold text-sky-900">👑 HR Admin</span>
-                <span className="text-[10px] text-sky-600">ID: ADMIN001</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleFillDemo('employee')}
-                className="p-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-semibold text-left transition flex flex-col"
-              >
-                <span className="font-bold text-emerald-900">👤 Employee</span>
-                <span className="text-[10px] text-emerald-600">ID: EMP001</span>
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Footer */}
