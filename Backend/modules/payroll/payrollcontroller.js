@@ -1,137 +1,208 @@
-import { getDB } from "../../config/db.js";
+import { prisma } from "../../config/db.js";
 import transporter from "../mail/mailtransporter.js";
 
-// ✅ 1. GET USER SALARY INFO BY ID (Self-Healing Fallback from users collection)
+// ✅ 1. GET USER SALARY INFO BY ID (Native Prisma)
 const usersalarybyitsid = async (req, res) => {
-  const db = getDB();
   const { id } = req.params;
-  console.log("Salary info requested for ID:", id);
+  const employeeId = String(id).trim();
 
   try {
-    let salaryDoc = await db.collection("SalaryInfo").findOne({ employee_id: id });
+    let salaryDoc = await prisma.salaryInfo.findFirst({
+      where: {
+        OR: [
+          { userId: employeeId },
+          { employeeId: employeeId },
+        ],
+      },
+    });
 
     // If salary info is already present, return it
     if (salaryDoc) {
-      return res.status(200).json(salaryDoc);
+      return res.status(200).json({
+        ...salaryDoc,
+        employee_id: salaryDoc.userId || salaryDoc.employeeId,
+        base_salary: salaryDoc.basicSalary,
+        tax_percent: salaryDoc.taxDeduction,
+        pf_percent: salaryDoc.pf,
+      });
     }
 
-    // Fallback: Check if user exists in `users` collection
-    const user = await db.collection("users").findOne({ user_id: id });
+    // Fallback: Check if user exists in `user` table
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { userId: employeeId },
+          { id: employeeId },
+        ],
+      },
+    });
+
     if (!user) {
       return res.status(404).json({ message: "Employee user not found." });
     }
 
     // Auto-generate standard salary structure from user profile
-    const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
     const baseSalary = Number(user.salary) || 75000;
-    const hra = Math.round(baseSalary * 0.4);
+    const hra = Math.round(baseSalary * 0.3);
+    const allowance = Math.round(baseSalary * 0.2);
     const bonus = 5000;
-    const taxPercent = 10;
-    const pfPercent = 12;
-    const paidLeavesAllowed = 2;
-    const joiningDate = user.joigningDate || nowIST.toISOString().split("T")[0];
+    const pf = Math.round(baseSalary * 0.12);
+    const tax = Math.round(baseSalary * 0.05);
+    const netSalary = baseSalary - (pf + tax);
 
-    const autoSalaryInfo = {
-      employee_id: user.user_id,
-      employee_name: user.username,
-      base_salary: baseSalary,
-      hra,
-      bonus,
-      tax_percent: taxPercent,
-      pf_percent: pfPercent,
-      paid_leaves_allowed: paidLeavesAllowed,
-      joining_date: joiningDate,
-      last_update: nowIST,
-      updated_by: "System Initialization",
-    };
+    const autoSalaryInfo = await prisma.salaryInfo.create({
+      data: {
+        userId: user.userId,
+        employeeId: user.userId,
+        employeeName: user.username,
+        basicSalary: baseSalary,
+        hra,
+        allowance,
+        bonus,
+        pf,
+        taxDeduction: tax,
+        netSalary,
+        paidLeavesAllowed: 2,
+        joiningDate: user.joigningDate || new Date().toISOString().split("T")[0],
+      },
+    });
 
-    // Upsert into SalaryInfo
-    await db.collection("SalaryInfo").updateOne(
-      { employee_id: id },
-      { $setOnInsert: autoSalaryInfo },
-      { upsert: true }
-    );
-
-    console.log(`✅ Auto-initialized SalaryInfo record for user: ${id}`);
-    return res.status(200).json(autoSalaryInfo);
+    return res.status(200).json({
+      ...autoSalaryInfo,
+      employee_id: autoSalaryInfo.userId,
+      base_salary: autoSalaryInfo.basicSalary,
+      tax_percent: 10,
+      pf_percent: 12,
+    });
   } catch (error) {
     console.error("Error fetching user salary by ID:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-// ✅ 2. GENERATE / FETCH SALARY SLIP
+// ✅ 2. GENERATE / FETCH SALARY SLIP (Native Prisma)
 const GenerateSlip = async (req, res) => {
-  const db = getDB();
   const { user_id, month } = req.body;
+  const employeeId = String(user_id).trim();
 
   try {
-    let user = await db.collection("SalaryInfo").findOne({ employee_id: user_id });
+    let salaryInfo = await prisma.salaryInfo.findFirst({
+      where: {
+        OR: [{ userId: employeeId }, { employeeId }],
+      },
+    });
 
-    // If not found in SalaryInfo, auto-initialize from users
-    if (!user) {
-      const userDoc = await db.collection("users").findOne({ user_id });
+    // If not found in SalaryInfo, find or create from User
+    if (!salaryInfo) {
+      const userDoc = await prisma.user.findFirst({
+        where: {
+          OR: [{ userId: employeeId }, { id: employeeId }],
+        },
+      });
+
       if (!userDoc) {
         return res.status(400).json({ error: "Employee record not found" });
       }
-      const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
+
       const baseSalary = Number(userDoc.salary) || 75000;
-      user = {
-        employee_id: userDoc.user_id,
-        employee_name: userDoc.username,
-        base_salary: baseSalary,
-        hra: Math.round(baseSalary * 0.4),
-        bonus: 5000,
-        tax_percent: 10,
-        pf_percent: 12,
-        paid_leaves_allowed: 2,
-        joining_date: userDoc.joigningDate || nowIST.toISOString().split("T")[0],
-        last_update: nowIST,
-        updated_by: "System Initialization",
-      };
-      await db.collection("SalaryInfo").updateOne(
-        { employee_id: user_id },
-        { $setOnInsert: user },
-        { upsert: true }
-      );
+      salaryInfo = await prisma.salaryInfo.create({
+        data: {
+          userId: userDoc.userId,
+          employeeId: userDoc.userId,
+          employeeName: userDoc.username,
+          basicSalary: baseSalary,
+          hra: Math.round(baseSalary * 0.3),
+          allowance: Math.round(baseSalary * 0.2),
+          bonus: 5000,
+          pf: Math.round(baseSalary * 0.12),
+          taxDeduction: Math.round(baseSalary * 0.05),
+          netSalary: baseSalary - Math.round(baseSalary * 0.17),
+          paidLeavesAllowed: 2,
+          joiningDate: userDoc.joigningDate || new Date().toISOString().split("T")[0],
+        },
+      });
     }
 
-    // Check if slip for this month was already generated
-    const salaryslip = await db.collection("Payrolls").findOne({
-      employee_id: user_id,
-      month,
+    // Check if payroll slip for this month was already generated
+    const existingSlip = await prisma.payrollRecord.findFirst({
+      where: {
+        userId: employeeId,
+        month: String(month),
+      },
     });
 
-    if (salaryslip) {
-      return res.json(salaryslip);
+    if (existingSlip) {
+      return res.json({
+        ...existingSlip,
+        employee_id: existingSlip.userId,
+        employee_name: existingSlip.employeeName,
+        basic_salary: existingSlip.basicSalary,
+        attendance_summary: {
+          total_working_days: existingSlip.totalWorkingDays,
+          present_days: existingSlip.presentDays,
+          absent_days: existingSlip.absentDays,
+          paid_leave_allowance: existingSlip.paidLeaveAllowance,
+          unpaid_leave_days: existingSlip.unpaidLeaveDays,
+        },
+        deductions: {
+          tax_amount: existingSlip.taxAmount,
+          pf_amount: existingSlip.pfAmount,
+          leave_deduction: existingSlip.leaveDeduction,
+          total_deduction: existingSlip.totalDeductions,
+        },
+        salary_breakdown: {
+          gross_salary: existingSlip.basicSalary,
+          net_salary: existingSlip.netSalary,
+        },
+      });
     }
 
     // Calculate from attendance
-    const attendance = await db
-      .collection("Attendance")
-      .find({
-        user_id,
-        date: { $regex: `^${month}` },
-      })
-      .toArray();
+    const attendance = await prisma.attendance.findMany({
+      where: {
+        userId: employeeId,
+        date: { startsWith: String(month) },
+      },
+    });
 
     const presentDays = attendance.filter((a) => a.status === "Present" || a.status === "Late").length;
-    const basicSalary = Number(user.base_salary) || 75000;
+    const basicSalary = Number(salaryInfo.basicSalary) || 75000;
     const workingDays = 26;
-    const paidLeaves = Number(user.paid_leaves_allowed) || 2;
+    const paidLeaves = Number(salaryInfo.paidLeavesAllowed) || 2;
     const absentDays = Math.max(0, workingDays - presentDays);
 
-    const tax = basicSalary * ((Number(user.tax_percent) || 10) / 100);
-    const pf = basicSalary * ((Number(user.pf_percent) || 12) / 100);
+    const tax = Math.round(basicSalary * 0.10);
+    const pf = Math.round(basicSalary * 0.12);
     const unpaidLeaves = Math.max(0, absentDays - paidLeaves);
-    const leaveDeduction = unpaidLeaves * (basicSalary / workingDays);
-    const totalDeduction = tax + pf + leaveDeduction;
-    const netSalary = Math.max(0, basicSalary - totalDeduction);
+    const leaveDeduction = Math.round(unpaidLeaves * (basicSalary / workingDays));
+    const totalDeductions = tax + pf + leaveDeduction;
+    const netSalary = Math.max(0, basicSalary - totalDeductions);
 
-    const payrollDoc = {
-      employee_id: user_id,
-      employee_name: user.employee_name,
-      month,
+    const createdRecord = await prisma.payrollRecord.create({
+      data: {
+        userId: employeeId,
+        employeeName: salaryInfo.employeeName || `Employee ${employeeId}`,
+        month: String(month),
+        year: Number(String(month).split("-")[0]) || new Date().getFullYear(),
+        basicSalary,
+        totalWorkingDays: workingDays,
+        presentDays,
+        absentDays,
+        paidLeaveAllowance: paidLeaves,
+        unpaidLeaveDays: unpaidLeaves,
+        taxAmount: tax,
+        pfAmount: pf,
+        leaveDeduction,
+        totalDeductions,
+        netSalary,
+        status: "Processed",
+      },
+    });
+
+    return res.json({
+      ...createdRecord,
+      employee_id: employeeId,
+      employee_name: createdRecord.employeeName,
       basic_salary: basicSalary,
       attendance_summary: {
         total_working_days: workingDays,
@@ -141,30 +212,24 @@ const GenerateSlip = async (req, res) => {
         unpaid_leave_days: unpaidLeaves,
       },
       deductions: {
-        tax_amount: Math.round(tax),
-        pf_amount: Math.round(pf),
-        leave_deduction: Math.round(leaveDeduction),
-        total_deduction: Math.round(totalDeduction),
+        tax_amount: tax,
+        pf_amount: pf,
+        leave_deduction: leaveDeduction,
+        total_deduction: totalDeductions,
       },
       salary_breakdown: {
         gross_salary: basicSalary,
-        net_salary: Math.round(netSalary),
+        net_salary: netSalary,
       },
-      status: "Processed",
-      generated_on: new Date().toISOString().slice(0, 10),
-    };
-
-    await db.collection("Payrolls").insertOne(payrollDoc);
-    return res.json(payrollDoc);
+    });
   } catch (error) {
     console.error("Salary generation error:", error);
     return res.status(500).json({ error: error.message });
   }
 };
 
-// ✅ 3. ADD / UPSERT SALARY INFO
+// ✅ 3. ADD / UPSERT SALARY INFO WITH TRANSACTION
 const Addsalaryinfo = async (req, res) => {
-  const db = getDB();
   const {
     employee_id,
     employee_name,
@@ -175,52 +240,71 @@ const Addsalaryinfo = async (req, res) => {
     pf_percent,
     paid_leaves_allowed,
     joining_date,
-    updated_by,
   } = req.body;
 
   if (!employee_id) {
     return res.status(400).json({ message: "Employee ID is required." });
   }
 
+  const cleanId = String(employee_id).trim();
+
   try {
-    const userDoc = await db.collection("users").findOne({ user_id: employee_id });
-    const name = employee_name || userDoc?.username || `Employee ${employee_id}`;
+    const userDoc = await prisma.user.findFirst({
+      where: {
+        OR: [{ userId: cleanId }, { id: cleanId }],
+      },
+    });
+
+    const name = employee_name || userDoc?.username || `Employee ${cleanId}`;
     const base = Number(base_salary) || Number(userDoc?.salary) || 75000;
+    const hraVal = hra !== undefined && hra !== "" ? Number(hra) : Math.round(base * 0.3);
+    const bonusVal = bonus !== undefined && bonus !== "" ? Number(bonus) : 5000;
+    const pfVal = pf_percent !== undefined && pf_percent !== "" ? Math.round(base * (Number(pf_percent) / 100)) : Math.round(base * 0.12);
+    const taxVal = tax_percent !== undefined && tax_percent !== "" ? Math.round(base * (Number(tax_percent) / 100)) : Math.round(base * 0.05);
+    const net = base - (pfVal + taxVal);
     const joinDate = joining_date || userDoc?.joigningDate || new Date().toISOString().split("T")[0];
-    const updater = updated_by || req.user?.username || "Admin";
 
-    const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
-
-    const docToSave = {
-      employee_id,
-      employee_name: name,
-      base_salary: base,
-      hra: hra !== undefined && hra !== "" ? Number(hra) : Math.round(base * 0.4),
-      bonus: bonus !== undefined && bonus !== "" ? Number(bonus) : 5000,
-      tax_percent: tax_percent !== undefined && tax_percent !== "" ? Number(tax_percent) : 10,
-      pf_percent: pf_percent !== undefined && pf_percent !== "" ? Number(pf_percent) : 12,
-      paid_leaves_allowed: Number(paid_leaves_allowed) || 2,
-      joining_date: joinDate,
-      last_update: nowIST,
-      updated_by: updater,
-    };
-
-    const result = await db.collection("SalaryInfo").updateOne(
-      { employee_id },
-      { $set: docToSave },
-      { upsert: true }
-    );
-
-    // Also update base salary in `users` collection to keep in sync
-    await db.collection("users").updateOne(
-      { user_id: employee_id },
-      { $set: { salary: base } }
-    );
+    // Atomic transaction: update salary structure and user salary simultaneously
+    const [savedSalary] = await prisma.$transaction([
+      prisma.salaryInfo.upsert({
+        where: { userId: cleanId },
+        update: {
+          employeeName: name,
+          basicSalary: base,
+          hra: hraVal,
+          bonus: bonusVal,
+          pf: pfVal,
+          taxDeduction: taxVal,
+          netSalary: net,
+          paidLeavesAllowed: Number(paid_leaves_allowed) || 2,
+          joiningDate: joinDate,
+        },
+        create: {
+          userId: cleanId,
+          employeeId: cleanId,
+          employeeName: name,
+          basicSalary: base,
+          hra: hraVal,
+          allowance: Math.round(base * 0.2),
+          bonus: bonusVal,
+          pf: pfVal,
+          taxDeduction: taxVal,
+          netSalary: net,
+          paidLeavesAllowed: Number(paid_leaves_allowed) || 2,
+          joiningDate: joinDate,
+        },
+      }),
+      prisma.user.updateMany({
+        where: {
+          OR: [{ userId: cleanId }, { id: cleanId }],
+        },
+        data: { salary: base },
+      }),
+    ]);
 
     return res.status(200).json({
       message: "Salary info saved successfully.",
-      data: docToSave,
-      result,
+      data: savedSalary,
     });
   } catch (error) {
     console.error("Error adding salary info:", error);
@@ -228,9 +312,8 @@ const Addsalaryinfo = async (req, res) => {
   }
 };
 
-// ✅ 4. UPDATE SALARY INFO
+// ✅ 4. UPDATE SALARY INFO WITH TRANSACTION
 const Updatesalaryinfo = async (req, res) => {
-  const db = getDB();
   const {
     employee_id,
     employee_name,
@@ -241,74 +324,97 @@ const Updatesalaryinfo = async (req, res) => {
     pf_percent,
     paid_leaves_allowed,
     joining_date,
-    updated_by,
   } = req.body;
 
   if (!employee_id) {
     return res.status(400).json({ message: "Employee ID is required." });
   }
 
+  const cleanId = String(employee_id).trim();
+
   try {
-    const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
-    const olddata = (await db.collection("SalaryInfo").findOne({ employee_id })) || {};
-    const user = await db.collection("users").findOne({ user_id: employee_id });
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [{ userId: cleanId }, { id: cleanId }],
+      },
+    });
 
-    const base = Number(base_salary) || Number(olddata.base_salary) || 75000;
+    const oldSalary = await prisma.salaryInfo.findFirst({
+      where: {
+        OR: [{ userId: cleanId }, { employeeId: cleanId }],
+      },
+    });
 
-    const updateFields = {
-      employee_id,
-      employee_name: employee_name || olddata.employee_name || user?.username || `Employee ${employee_id}`,
-      base_salary: base,
-      hra: hra !== undefined && hra !== "" ? Number(hra) : (olddata.hra ?? Math.round(base * 0.4)),
-      bonus: bonus !== undefined && bonus !== "" ? Number(bonus) : (olddata.bonus ?? 5000),
-      tax_percent: tax_percent !== undefined && tax_percent !== "" ? Number(tax_percent) : (olddata.tax_percent ?? 10),
-      pf_percent: pf_percent !== undefined && pf_percent !== "" ? Number(pf_percent) : (olddata.pf_percent ?? 12),
-      paid_leaves_allowed: Number(paid_leaves_allowed) || olddata.paid_leaves_allowed || 2,
-      joining_date: joining_date || olddata.joining_date || user?.joigningDate || nowIST.toISOString().split("T")[0],
-      last_update: nowIST,
-      updated_by: updated_by || req.user?.username || "Admin",
-    };
+    const base = Number(base_salary) || Number(oldSalary?.basicSalary) || Number(user?.salary) || 75000;
+    const name = employee_name || oldSalary?.employeeName || user?.username || `Employee ${cleanId}`;
+    const hraVal = hra !== undefined && hra !== "" ? Number(hra) : (oldSalary?.hra ?? Math.round(base * 0.3));
+    const bonusVal = bonus !== undefined && bonus !== "" ? Number(bonus) : (oldSalary?.bonus ?? 5000);
+    const pfVal = pf_percent !== undefined && pf_percent !== "" ? Math.round(base * (Number(pf_percent) / 100)) : (oldSalary?.pf ?? Math.round(base * 0.12));
+    const taxVal = tax_percent !== undefined && tax_percent !== "" ? Math.round(base * (Number(tax_percent) / 100)) : (oldSalary?.taxDeduction ?? Math.round(base * 0.05));
+    const net = base - (pfVal + taxVal);
+    const joinDate = joining_date || oldSalary?.joiningDate || user?.joigningDate || new Date().toISOString().split("T")[0];
 
-    await db.collection("SalaryInfo").updateOne(
-      { employee_id },
-      { $set: updateFields },
-      { upsert: true }
-    );
-
-    // Sync base salary to user
-    await db.collection("users").updateOne(
-      { user_id: employee_id },
-      { $set: { salary: base } }
-    );
+    // Atomic transaction
+    const [updatedSalary] = await prisma.$transaction([
+      prisma.salaryInfo.upsert({
+        where: { userId: cleanId },
+        update: {
+          employeeName: name,
+          basicSalary: base,
+          hra: hraVal,
+          bonus: bonusVal,
+          pf: pfVal,
+          taxDeduction: taxVal,
+          netSalary: net,
+          paidLeavesAllowed: Number(paid_leaves_allowed) || oldSalary?.paidLeavesAllowed || 2,
+          joiningDate: joinDate,
+        },
+        create: {
+          userId: cleanId,
+          employeeId: cleanId,
+          employeeName: name,
+          basicSalary: base,
+          hra: hraVal,
+          allowance: Math.round(base * 0.2),
+          bonus: bonusVal,
+          pf: pfVal,
+          taxDeduction: taxVal,
+          netSalary: net,
+          paidLeavesAllowed: Number(paid_leaves_allowed) || 2,
+          joiningDate: joinDate,
+        },
+      }),
+      prisma.user.updateMany({
+        where: {
+          OR: [{ userId: cleanId }, { id: cleanId }],
+        },
+        data: { salary: base },
+      }),
+    ]);
 
     // Send email notification safely in background
     if (user?.email && transporter) {
-      try {
-        transporter.sendMail({
-          from: `"Lucent PolySystems Pvt. Ltd." <${process.env.SMTP_EMAIL || "hr@lucentpolysystem.com"}>`,
-          to: user.email,
-          subject: "Lucent PolySystems – Salary Update Notification",
-          html: `
-            <p>Dear <strong>${updateFields.employee_name}</strong>,</p>
-            <p>Your salary record has been successfully updated on ${new Date().toLocaleDateString()}.</p>
-            <ul>
-              <li><strong>Base Salary:</strong> ₹${updateFields.base_salary}</li>
-              <li><strong>HRA:</strong> ₹${updateFields.hra}</li>
-              <li><strong>Bonus:</strong> ₹${updateFields.bonus}</li>
-              <li><strong>Tax:</strong> ${updateFields.tax_percent}%</li>
-              <li><strong>PF:</strong> ${updateFields.pf_percent}%</li>
-            </ul>
-            <p>Best regards,<br><strong>Lucent PolySystems Pvt. Ltd. HR Team</strong></p>
-          `,
-        }).catch((e) => console.log("Salary update email notice skipped:", e.message));
-      } catch (err) {
-        console.log("Email dispatch caught:", err.message);
-      }
+      transporter.sendMail({
+        from: `"Lucent PolySystems Pvt. Ltd." <${process.env.SMTP_EMAIL || "hr@lucentpolysystems.com"}>`,
+        to: user.email,
+        subject: "Lucent PolySystems – Salary Update Notification",
+        html: `
+          <p>Dear <strong>${name}</strong>,</p>
+          <p>Your salary record has been successfully updated.</p>
+          <ul>
+            <li><strong>Base Salary:</strong> ₹${base}</li>
+            <li><strong>HRA:</strong> ₹${hraVal}</li>
+            <li><strong>Bonus:</strong> ₹${bonusVal}</li>
+            <li><strong>Estimated Net Salary:</strong> ₹${net}</li>
+          </ul>
+          <p>Best regards,<br><strong>Lucent PolySystems Pvt. Ltd. HR Team</strong></p>
+        `,
+      }).catch((e) => console.log("Notice: Salary update email skipped:", e.message));
     }
 
     res.status(200).json({
       message: "Salary info updated successfully.",
-      updatedFields: updateFields,
+      updatedFields: updatedSalary,
     });
   } catch (error) {
     console.error("Error updating salary info:", error);

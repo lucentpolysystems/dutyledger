@@ -1,4 +1,4 @@
-import { getDB } from "../../config/db.js";
+import { prisma } from "../../config/db.js";
 
 // Helper to format Date in 12-hour AM/PM format
 const formatTimeAMPM = (dateObj) => {
@@ -14,52 +14,60 @@ const formatTimeAMPM = (dateObj) => {
   return `${strHours}:${strMinutes} ${ampm}`;
 };
 
-// ✅ GET /attendance/:userId
+// ✅ GET /attendance/:userId (Native Prisma)
 export const getTodayAttendance = async (req, res) => {
-  const db = getDB();
-  const user_id = String(req.params.userId);
+  const userId = String(req.params.userId).trim();
   const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
   const today = nowIST.toISOString().split("T")[0];
 
   try {
-    const data = await db.collection("Attendance").findOne({ user_id, date: today });
+    const data = await prisma.attendance.findFirst({
+      where: {
+        userId,
+        date: today,
+      },
+    });
+
     if (!data) {
       return res.status(200).json({ status: "Absent", in_time: null, out_time: null });
     } else {
       return res.status(200).json({
         status: data.status || "Present",
-        in_time: data.in_time || formatTimeAMPM(data.time),
-        out_time: data.out_time || null,
-        total_hours: data.total_hours || null,
-        work_duration: data.work_duration || null,
+        in_time: data.inTime || formatTimeAMPM(data.time),
+        out_time: data.outTime || null,
+        total_hours: data.totalHours || null,
+        work_duration: data.workDuration || null,
       });
     }
   } catch (err) {
-    console.error("❌ Error:", err);
+    console.error("❌ Error fetching today's attendance:", err);
     res.status(500).json({ error: "DB error" });
   }
 };
 
-// ✅ POST /mark-attendance
+// ✅ POST /mark-attendance (Native Prisma)
 export const markAttendance = async (req, res) => {
   try {
-    const db = getDB();
     const { username, location, id, punchType } = req.body;
-    console.log("📥 Request body:", req.body);
 
-    // 1. Find user (flexible by user_id or username)
-    const user = await db.collection("users").findOne({
-      $or: [
-        { user_id: String(id) },
-        { username: username },
-      ],
+    // 1. Find user by userId or username
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { userId: String(id).trim() },
+          { username: String(username).trim() },
+        ],
+      },
     });
-    if (!user) return res.status(404).json({ message: "❌ User not found in database" });
 
-    const canonicalUserId = user.user_id || String(id);
-    const canonicalUsername = user.username || username;
+    if (!user) {
+      return res.status(404).json({ message: "❌ User not found in database" });
+    }
 
-    // 2. Check location against office coordinates
+    const canonicalUserId = user.userId;
+    const canonicalUsername = user.username;
+
+    // 2. Geofence check against office coordinates
     const office = { lat: 22.816958, lng: 72.473781 };
     const distance = (loc1, loc2) => {
       const R = 6371;
@@ -77,8 +85,6 @@ export const markAttendance = async (req, res) => {
     let punchLocation = location || office;
     if (location && location.lat && location.lng) {
       const dist = distance(location, office);
-      console.log("📍 Distance from office:", dist.toFixed(2), "km");
-      // Enforce strict geofence only in production when bypass is not enabled
       if (dist > 3 && !location.bypassGeofence && process.env.NODE_ENV === "production") {
         return res.status(403).json({
           message: `⛔ Not at office location! Distance (${dist.toFixed(1)} km) exceeds 3km tolerance.`,
@@ -86,7 +92,7 @@ export const markAttendance = async (req, res) => {
       }
     }
 
-    // 3. Get IST time
+    // 3. IST Timestamp calculation
     const utcNow = new Date();
     const istOffset = 5.5 * 60 * 60 * 1000;
     const istNow = new Date(utcNow.getTime() + istOffset);
@@ -98,9 +104,11 @@ export const markAttendance = async (req, res) => {
     const timeFormatted = formatTimeAMPM(istNow);
 
     // 4. Check existing record for today
-    const existing = await db.collection("Attendance").findOne({
-      user_id: canonicalUserId,
-      date: today,
+    const existing = await prisma.attendance.findFirst({
+      where: {
+        userId: canonicalUserId,
+        date: today,
+      },
     });
 
     const isPunchIn = punchType === "IN" || (!punchType && !existing);
@@ -109,16 +117,16 @@ export const markAttendance = async (req, res) => {
     if (isPunchIn) {
       if (existing) {
         return res.status(200).json({
-          message: `ℹ️ Already checked in today at ${existing.in_time || "earlier"}.`,
+          message: `ℹ️ Already checked in today at ${existing.inTime || "earlier"}.`,
           record: existing,
           alreadyCheckedIn: true,
-          in_time: existing.in_time,
-          out_time: existing.out_time,
+          in_time: existing.inTime,
+          out_time: existing.outTime,
           status: existing.status,
         });
       }
 
-      // First punch of the day: Check-In (IN)
+      // Determine late / on-time status
       let status = "Late Absent";
       if (totalMinutes <= 615) {
         status = "Present";
@@ -126,27 +134,28 @@ export const markAttendance = async (req, res) => {
         status = "Late";
       }
 
-      const newRecord = {
-        user_id: canonicalUserId,
-        username: canonicalUsername,
-        location: punchLocation,
-        time: istNow,
-        in_time_raw: istNow,
-        in_time: timeFormatted,
-        out_time: null,
-        out_time_raw: null,
-        work_duration: null,
-        total_hours: null,
-        date: today,
-        status,
-        punch_type: "IN",
-        punches: [{ type: "IN", time: istNow, timeFormatted, location: punchLocation }],
-      };
+      const created = await prisma.attendance.create({
+        data: {
+          userId: canonicalUserId,
+          username: canonicalUsername,
+          location: punchLocation,
+          time: istNow,
+          inTimeRaw: istNow,
+          inTime: timeFormatted,
+          outTime: null,
+          outTimeRaw: null,
+          workDuration: null,
+          totalHours: null,
+          date: today,
+          status,
+          punchType: "IN",
+          punches: [{ type: "IN", time: istNow, timeFormatted, location: punchLocation }],
+        },
+      });
 
-      await db.collection("Attendance").insertOne(newRecord);
       return res.status(200).json({
         message: `✅ Check-in recorded at ${timeFormatted} (Status: '${status}')`,
-        record: newRecord,
+        record: created,
         status,
         in_time: timeFormatted,
         out_time: null,
@@ -158,8 +167,8 @@ export const markAttendance = async (req, res) => {
         });
       }
 
-      // Check-Out (OUT)
-      const inTimeRaw = existing.in_time_raw || existing.time || istNow;
+      // Check-Out calculation
+      const inTimeRaw = existing.inTimeRaw || existing.time || istNow;
       const diffMs = Math.max(0, istNow.getTime() - new Date(inTimeRaw).getTime());
       const totalWorkMinutes = Math.floor(diffMs / (1000 * 60));
       const durHours = Math.floor(totalWorkMinutes / 60);
@@ -172,27 +181,26 @@ export const markAttendance = async (req, res) => {
         finalStatus = "Half Day";
       }
 
-      await db.collection("Attendance").updateOne(
-        { _id: existing._id },
-        {
-          $set: {
-            out_time: timeFormatted,
-            out_time_raw: istNow,
-            work_duration,
-            total_hours,
-            status: finalStatus,
-            punch_type: "OUT",
-          },
-          $push: {
-            punches: { type: "OUT", time: istNow, timeFormatted, location: punchLocation },
-          },
-        }
-      );
+      const currentPunches = Array.isArray(existing.punches) ? existing.punches : [];
+      currentPunches.push({ type: "OUT", time: istNow, timeFormatted, location: punchLocation });
+
+      await prisma.attendance.update({
+        where: { id: existing.id },
+        data: {
+          outTime: timeFormatted,
+          outTimeRaw: istNow,
+          workDuration: work_duration,
+          totalHours: total_hours,
+          status: finalStatus,
+          punchType: "OUT",
+          punches: currentPunches,
+        },
+      });
 
       return res.status(200).json({
         message: `✅ Check-out recorded at ${timeFormatted} (Total Shift: ${work_duration})`,
         out_time: timeFormatted,
-        in_time: existing.in_time,
+        in_time: existing.inTime,
         work_duration,
         total_hours,
         status: finalStatus,
@@ -205,49 +213,55 @@ export const markAttendance = async (req, res) => {
   }
 };
 
-// ✅ GET /all-attendance
+// ✅ GET /all-attendance (Native Prisma)
 export const getAllAttendance = async (req, res) => {
   try {
-    const db = getDB();
     const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
     const today = nowIST.toISOString().split("T")[0];
 
-    const attendance = await db
-      .collection("Attendance")
-      .find({ date: today })
-      .sort({ time: -1 })
-      .toArray();
+    const attendance = await prisma.attendance.findMany({
+      where: { date: today },
+      orderBy: { createdAt: "desc" },
+    });
 
-    res.status(200).json({ attendance });
+    const mapped = attendance.map((a) => ({
+      ...a,
+      user_id: a.userId,
+      in_time: a.inTime,
+      out_time: a.outTime,
+      work_duration: a.workDuration,
+      total_hours: a.totalHours,
+    }));
+
+    res.status(200).json({ attendance: mapped });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching attendance in db", error });
+    res.status(500).json({ message: "Error fetching attendance in db", error: error.message });
   }
 };
 
 // ✅ GET /getAllAttendanceByMonthofuser/:userId/:month
 export const getAllAttendanceByMonthofuser = async (req, res) => {
-  const db = getDB();
   const { userId, month } = req.params;
 
   try {
-    const attendance = await db
-      .collection("Attendance")
-      .find({
-        user_id: String(userId),
-        date: { $regex: `^${month}` },
-      })
-      .sort({ date: 1 })
-      .toArray();
+    const attendance = await prisma.attendance.findMany({
+      where: {
+        userId: String(userId).trim(),
+        date: { startsWith: String(month).trim() },
+      },
+      orderBy: { date: "asc" },
+    });
 
     const formatted = attendance.map((record) => {
-      const inTime = record.in_time || (record.time ? formatTimeAMPM(record.time) : "--:--");
-      const outTime = record.out_time || null;
+      const inTime = record.inTime || (record.time ? formatTimeAMPM(record.time) : "--:--");
+      const outTime = record.outTime || null;
       return {
         ...record,
+        user_id: record.userId,
         in_time: inTime,
         out_time: outTime,
-        work_duration: record.work_duration || (record.total_hours ? `${record.total_hours} hrs` : null),
-        total_hours: record.total_hours || null,
+        work_duration: record.workDuration || (record.totalHours ? `${record.totalHours} hrs` : null),
+        total_hours: record.totalHours || null,
       };
     });
 
@@ -261,21 +275,20 @@ export const getAllAttendanceByMonthofuser = async (req, res) => {
 // ✅ GET /all-attendance-by-month/:month
 export const getAllAttendanceByMonth = async (req, res) => {
   try {
-    const db = getDB();
     const { month } = req.params;
 
-    const attendance = await db
-      .collection("Attendance")
-      .find({
-        date: { $regex: `^${month}` },
-      })
-      .sort({ date: 1 })
-      .toArray();
+    const attendance = await prisma.attendance.findMany({
+      where: {
+        date: { startsWith: String(month).trim() },
+      },
+      orderBy: { date: "asc" },
+    });
 
     const formatted = attendance.map((record) => ({
       ...record,
-      in_time: record.in_time || (record.time ? formatTimeAMPM(record.time) : "--:--"),
-      out_time: record.out_time || null,
+      user_id: record.userId,
+      in_time: record.inTime || (record.time ? formatTimeAMPM(record.time) : "--:--"),
+      out_time: record.outTime || null,
     }));
 
     res.status(200).json({ attendance: formatted });

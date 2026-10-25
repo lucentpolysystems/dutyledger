@@ -1,8 +1,10 @@
+import { prisma } from "../../config/db.js";
+
 /**
  * Compiles a flat Set of permission codes given an array of role IDs and direct permissions.
- * Traverses role inheritance (inherits_from) recursively.
+ * Traverses role inheritance (inheritsFrom) recursively using native Prisma.
  */
-async function compileUserPermissions(db, roleIds = [], directPermissions = []) {
+async function compileUserPermissions(ignoredDb, roleIds = [], directPermissions = []) {
   const permissionSet = new Set(directPermissions || []);
 
   if (!roleIds || roleIds.length === 0) {
@@ -17,15 +19,17 @@ async function compileUserPermissions(db, roleIds = [], directPermissions = []) 
     if (visitedRoles.has(currentRoleId)) continue;
     visitedRoles.add(currentRoleId);
 
-    const roleDoc = await db.collection("roles").findOne({ role_id: currentRoleId });
+    const roleDoc = await prisma.role.findFirst({
+      where: { roleId: currentRoleId },
+    });
     if (!roleDoc) continue;
 
     if (Array.isArray(roleDoc.permissions)) {
       roleDoc.permissions.forEach((p) => permissionSet.add(p));
     }
 
-    if (Array.isArray(roleDoc.inheritsFrom || roleDoc.inherits_from)) {
-      (roleDoc.inheritsFrom || roleDoc.inherits_from).forEach((inheritedId) => {
+    if (Array.isArray(roleDoc.inheritsFrom)) {
+      roleDoc.inheritsFrom.forEach((inheritedId) => {
         if (!visitedRoles.has(inheritedId)) {
           queue.push(inheritedId);
         }
@@ -37,42 +41,44 @@ async function compileUserPermissions(db, roleIds = [], directPermissions = []) 
 }
 
 /**
- * Recomputes and updates a user's cached_permissions and bumps permission_version.
+ * Recomputes and updates a user's cachedPermissions and bumps permissionVersion.
  */
-async function recomputeAndSaveUserPermissions(db, userId) {
-  const user = await db.collection("users").findOne({ user_id: userId });
+async function recomputeAndSaveUserPermissions(ignoredDb, userId) {
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [{ userId: String(userId) }, { id: String(userId) }],
+    },
+  });
   if (!user) return null;
 
-  const compiled = await compileUserPermissions(db, user.roles || [], user.directPermissions || user.direct_permissions || []);
+  const compiled = await compileUserPermissions(null, user.roles || [], user.directPermissions || []);
 
-  await db.collection("users").updateOne(
-    { user_id: user.userId || user.user_id },
-    {
-      $set: {
-        cached_permissions: compiled,
-        updatedAt: new Date(),
-      },
-      $inc: { permission_version: 1 },
-    }
-  );
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      cachedPermissions: compiled,
+      permissionVersion: (user.permissionVersion || 1) + 1,
+    },
+  });
 
   return compiled;
 }
 
 /**
- * Records an immutable audit log entry.
+ * Records an immutable audit log entry via native Prisma.
  */
-async function logAuditEvent(db, { actor_id, actor_name, action, resource, target_id, details, ip }) {
+async function logAuditEvent(ignoredDb, { actor_id, actor_name, action, resource, target_id, details, ip }) {
   try {
-    await db.collection("audit_logs").insertOne({
-      timestamp: new Date(),
-      actor_id: actor_id || "SYSTEM",
-      actor_name: actor_name || "System Automated",
-      action,
-      resource,
-      target_id: target_id || null,
-      details: details || {},
-      ip: ip || "127.0.0.1",
+    await prisma.auditEvent.create({
+      data: {
+        actorId: actor_id || "SYSTEM",
+        actorName: actor_name || "System Automated",
+        action,
+        resource,
+        targetId: target_id || null,
+        details: details || {},
+        ip: ip || "127.0.0.1",
+      },
     });
   } catch (err) {
     console.error("Failed to write audit log:", err.message);

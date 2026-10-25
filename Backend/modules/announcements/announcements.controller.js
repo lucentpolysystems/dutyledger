@@ -1,4 +1,4 @@
-import { getDB, prisma } from "../../config/db.js";
+import { prisma } from "../../config/db.js";
 
 // HR creates a new announcement
 export const createAnnouncement = async (req, res) => {
@@ -24,24 +24,20 @@ export const createAnnouncement = async (req, res) => {
       });
     }
 
-    const db = getDB();
-
-    const announcement = {
-      title: String(title).trim(),
-      description: String(description).trim(),
-      startDate,
-      endDate,
-      createdBy: req.user?.username || "HR",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const result = await db.collection("Announcements").insertOne(announcement);
+    const created = await prisma.announcement.create({
+      data: {
+        title: String(title).trim(),
+        description: String(description).trim(),
+        startDate: String(startDate),
+        endDate: String(endDate),
+        createdBy: req.user?.username || "HR",
+      },
+    });
 
     res.status(201).json({
       success: true,
       message: "Announcement created successfully",
-      announcement: { _id: result.insertedId, id: result.insertedId, ...announcement },
+      announcement: created,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: "Error creating announcement", error: error.message });
@@ -51,12 +47,9 @@ export const createAnnouncement = async (req, res) => {
 // Fetch announcements for dashboard views
 export const getAnnouncements = async (req, res) => {
   try {
-    const db = getDB();
-    const announcements = await db
-      .collection("Announcements")
-      .find({})
-      .sort({ createdAt: -1 })
-      .toArray();
+    const announcements = await prisma.announcement.findMany({
+      orderBy: { createdAt: "desc" },
+    });
 
     res.status(200).json({ success: true, announcements });
   } catch (error) {
@@ -90,14 +83,13 @@ export const updateAnnouncement = async (req, res) => {
     }
 
     const updated = await prisma.announcement.update({
-      where: { id },
+      where: { id: String(id) },
       data: {
         title: String(title).trim(),
         description: String(description).trim(),
-        startDate,
-        endDate,
-        updatedAt: new Date(),
-      }
+        startDate: String(startDate),
+        endDate: String(endDate),
+      },
     });
 
     res.status(200).json({
