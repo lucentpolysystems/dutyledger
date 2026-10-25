@@ -18,6 +18,7 @@ model User {
   directPermissions   String[]         @default([]) @map("direct_permissions")
   cachedPermissions   String[]         @default([]) @map("cached_permissions")
   permissionVersion   Int              @default(1) @map("permission_version")
+  isActive            Boolean          @default(true) @map("is_active")
   department          String?          @default("General")
   designation         String?          @default("Staff")
   reportingTo         String?          @map("reporting_to")
@@ -43,6 +44,9 @@ model User {
   payrollRecords      PayrollRecord[]
   contactMessages     ContactHR[]
 
+  @@index([role])
+  @@index([department])
+  @@index([createdAt])
   @@map("users")
 }
 
@@ -63,6 +67,8 @@ model Attendance {
   updatedAt    DateTime  @updatedAt
 
   @@unique([userId, date])
+  @@index([date])
+  @@index([userId])
   @@map("attendance")
 }
 
@@ -81,6 +87,7 @@ model SalaryInfo {
   lastUpdate        DateTime @default(now()) @map("last_update")
   updatedBy         String   @default("System") @map("updated_by")
 
+  @@index([employeeId])
   @@map("salary_info")
 }
 
@@ -96,15 +103,17 @@ model PayrollRecord {
   paymentDate    DateTime? @map("payment_date")
   createdAt      DateTime  @default(now())
 
+  @@index([employeeId, year, month])
   @@map("payroll_records")
 }
 
 model Holiday {
   id        String   @id @default(uuid())
-  date      String
+  date      String   @unique
   reason    String
   createdAt DateTime @default(now())
 
+  @@index([date])
   @@map("holidays")
 }
 
@@ -118,6 +127,7 @@ model Announcement {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@index([createdAt])
   @@map("announcements")
 }
 
@@ -135,6 +145,8 @@ model ContactHR {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  @@index([employeeId])
+  @@index([status])
   @@map("contact_hr")
 }
 
@@ -163,5 +175,7 @@ model AuditEvent {
   ip        String?
   createdAt DateTime @default(now())
 
+  @@index([createdAt])
+  @@index([actorId])
   @@map("audit_events")
 }
