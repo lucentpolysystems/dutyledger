@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import LoadingSkeleton from "../Components/LoadingSkeleton";
 
@@ -11,7 +11,7 @@ import EmployeeLayoutDashboard from "../Components/Layout/EmployeLayout";
 const Login = lazy(() => import("../Pages/Login/Login"));
 const SetPassword = lazy(() => import("../Pages/Employee/Email"));
 
-// HR Pages (Lazy Loaded)
+// HR & Admin Pages (Lazy Loaded)
 const HRDashboard = lazy(() => import("../Pages/Admin/HrDashboard"));
 const Employees = lazy(() => import("../Pages/Admin/Employees"));
 const AddEmployee = lazy(() => import("../Pages/Admin/AddEmployee"));
@@ -48,26 +48,64 @@ const AppRoutes = () => {
   return (
     <Suspense fallback={<LoadingSkeleton />}>
       <Routes>
-        <Route path="/" element={<Login />} />
+        {/* Landing / Login route: redirect to dashboard if already authenticated */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? (
+              <Navigate
+                to={role === "employee" ? "/dashboard" : "/admin/dashboard"}
+                replace
+              />
+            ) : (
+              <Login />
+            )
+          }
+        />
 
         {/* Employee Routes */}
         {isAuthenticated && role === "employee" && (
           <Route path="/" element={<EmployeeLayoutDashboard />}>
+            {/* Clean Standard Routes */}
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="attendance" element={<Attendance />} />
+            <Route path="salary" element={<Salary />} />
+            <Route path="calendar" element={<Calendar />} />
+            <Route path="profile/:id" element={<Emprofile />} />
+            <Route path="contact-hr" element={<Contect />} />
+            <Route path="chat" element={<Chatbot />} />
+            <Route path="settings" element={<SettingsPage />} />
+
+            {/* Legacy Aliases for seamless backward compatibility */}
             <Route path="emhome" element={<Dashboard />} />
             <Route path="emattendance" element={<Attendance />} />
             <Route path="emsalary" element={<Salary />} />
             <Route path="emcalendar" element={<Calendar />} />
-            <Route path="attendance" element={<AttendanceNew />} />
             <Route path="emprofile/:id" element={<Emprofile />} />
-            <Route path="emchat" element={<Chatbot />} />
             <Route path="emcontect" element={<Contect />} />
-            <Route path="settings" element={<SettingsPage />} />
+            <Route path="emchat" element={<Chatbot />} />
           </Route>
         )}
 
         {/* HR, Admin, Super Admin, Manager, Team Leader Routes */}
         {isAuthenticated && (role === "hr" || role === "admin" || role === "super_admin" || role === "manager" || role === "team_leader") && (
           <Route path="/" element={<HrLayoutDashboard />}>
+            {/* Clean Standard Routes */}
+            <Route path="admin/dashboard" element={<HRDashboard />} />
+            <Route path="dashboard" element={<HRDashboard />} />
+            <Route path="admin/employees" element={<Employees />} />
+            <Route path="admin/employees/add" element={<AddEmployee />} />
+            <Route path="admin/employees/:id" element={<EmployeeDashboard />} />
+            <Route path="admin/payroll" element={<PayrollSystem />} />
+            <Route path="admin/payroll/:id" element={<PayrollPage />} />
+            <Route path="admin/calendar" element={<HRCalendar />} />
+            <Route path="admin/profile/:id" element={<Hrprofile />} />
+            <Route path="admin/queries" element={<Query />} />
+            <Route path="admin/announcements" element={<Announcements />} />
+            <Route path="admin/rbac" element={<RbacManagement />} />
+            <Route path="settings" element={<SettingsPage />} />
+
+            {/* Legacy Aliases for seamless backward compatibility */}
             <Route path="hrhome" element={<HRDashboard />} />
             <Route path="hremployees" element={<Employees />} />
             <Route path="hraddemployee" element={<AddEmployee />} />
@@ -78,9 +116,7 @@ const AppRoutes = () => {
             <Route path="hrprofile/:id" element={<Hrprofile />} />
             <Route path="hrquery" element={<Query />} />
             <Route path="hrannouncements" element={<Announcements />} />
-            <Route path="admin/rbac" element={<RbacManagement />} />
             <Route path="rbac" element={<RbacManagement />} />
-            <Route path="settings" element={<SettingsPage />} />
           </Route>
         )}
 

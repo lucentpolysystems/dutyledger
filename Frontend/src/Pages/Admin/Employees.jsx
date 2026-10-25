@@ -79,7 +79,7 @@ useEffect(() => {
             <h2 className="text-2xl font-semibold">Employees List</h2>
             <Can perform="employee:create">
               <button
-                onClick={() => navigate("/hraddemployee")}
+                onClick={() => navigate("/admin/employees/add")}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition shadow-sm w-fit"
               >
                 <UserPlus size={16} /> Add Employee
@@ -115,8 +115,8 @@ useEffect(() => {
              filteredEmployees.map((emp, index) => (
                   <tr
                     key={index}
-                    className="border-t border-gray-200 hover:bg-gray-50"
-                    onClick={()=>navigate(`/hremployees/profile/${emp.user_id}`)}
+                    className="border-t border-gray-200 hover:bg-gray-50 cursor-pointer"
+                    onClick={()=>navigate(`/admin/employees/${emp.user_id}`)}
                   >
                     <td className="px-6 py-4">{String(index + 1).padStart(2, "0")}</td>
                     <td className="px-6 py-4">{emp.user_id}</td>

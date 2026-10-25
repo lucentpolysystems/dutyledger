@@ -37,7 +37,7 @@ const Dashboard = () => {
   const [selectedRange, setSelectedRange] = useState("This Year");
 
   const handleBuddyPunching = () => {
-    navigate('/emattendance'); // your route path
+    navigate('/attendance');
   };
   const handleManagerPOV = () => {
     navigate('/emprofile/:id'); // your route path
@@ -212,7 +212,7 @@ const Dashboard = () => {
             )}
 
             <button
-              onClick={() => navigate("/emattendance")}
+              onClick={() => navigate("/attendance")}
               className="ml-2 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-bold transition shadow-xs cursor-pointer"
             >
               {todayDetails.in_time ? (todayDetails.out_time ? "View Attendance" : "Punch OUT") : "Punch IN"}

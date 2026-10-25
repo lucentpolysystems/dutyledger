@@ -298,7 +298,7 @@ console.log("📊 Attendance data:", employees[0]?.username);
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Recent Announcements (Last 10 Days)</h2>
               <button
-                onClick={() => navigate("/hrannouncements")}
+                onClick={() => navigate("/admin/announcements")}
                 className="text-sm bg-indigo-600 text-white px-3 py-2 rounded hover:bg-indigo-700"
               >
                 Manage Announcements

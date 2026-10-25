@@ -20,7 +20,12 @@ const Sidebar = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => {
+    if (path === '/admin/dashboard') {
+      return location.pathname === '/admin/dashboard' || location.pathname === '/dashboard' || location.pathname === '/hrhome';
+    }
+    return location.pathname === path || (path !== '/' && location.pathname.startsWith(path + '/'));
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -70,7 +75,7 @@ const Sidebar = () => {
                 {
                   label: 'Dashboard',
                   icon: <LayoutDashboard size={18} />,
-                  path: '/hrhome',
+                  path: '/admin/dashboard',
                   visible: true,
                 },
                 {
@@ -83,39 +88,39 @@ const Sidebar = () => {
                 {
                   label: 'Employees Directory',
                   icon: <Users size={18} />,
-                  path: '/hremployees',
+                  path: '/admin/employees',
                   visible: isSuper || perms.has('employees:read:all') || perms.has('employees:read:dept') || perms.has('employees:read:team'),
                 },
                 {
                   label: 'Add Employee',
                   icon: <UserPlus size={18} />,
-                  path: '/hraddemployee',
+                  path: '/admin/employees/add',
                   visible: isSuper || perms.has('employees:create'),
                   badge: 'HR',
                 },
                 {
                   label: 'Payroll System',
                   icon: <Wallet size={18} />,
-                  path: '/hrpayrollsystem',
+                  path: '/admin/payroll',
                   visible: isSuper || perms.has('payroll:read:all') || perms.has('payroll:structure:manage'),
                   badge: 'HR',
                 },
                 {
                   label: 'Company Calendar',
                   icon: <Calendar size={18} />,
-                  path: '/hrcalendar',
+                  path: '/admin/calendar',
                   visible: isSuper || perms.has('attendance:read:all') || perms.has('attendance:read:dept'),
                 },
                 {
                   label: 'Employee Queries',
                   icon: <UserRoundPen size={18} />,
-                  path: '/hrquery',
+                  path: '/admin/queries',
                   visible: isSuper || perms.has('queries:resolve') || perms.has('queries:read:team'),
                 },
                 {
                   label: 'Announcements',
                   icon: <Megaphone size={18} />,
-                  path: '/hrannouncements',
+                  path: '/admin/announcements',
                   visible: isSuper || perms.has('announcements:publish') || perms.has('announcements:read'),
                 },
                 {

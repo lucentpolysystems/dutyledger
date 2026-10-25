@@ -24,7 +24,12 @@ const Sidebar = () => {
   const user = useSelector((state) => state.auth.user);
 
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => {
+    if (path === '/dashboard') {
+      return location.pathname === '/dashboard' || location.pathname === '/emhome';
+    }
+    return location.pathname === path || (path !== '/' && location.pathname.startsWith(path + '/'));
+  };
 
   const handleLogout = () => {
    dispatch(logoutUser());
@@ -65,13 +70,13 @@ const Sidebar = () => {
           {/* Navigation Menu */}
           <nav className="space-y-3">
             {[
-              { label: 'Dashboard', icon: <LayoutDashboard size={18} />, path: '/emhome' },
-              { label: 'Attendance', icon: <Users size={18} />, path: '/emattendance' },
-              { label: 'Salary', icon: <DollarSign size={18} />, path: '/emsalary' },
-              { label: 'Calendar', icon: <Calendar size={18} />, path: '/emcalendar' },
-              { label: 'Profile', icon: <User size={18} />, path: `/emprofile/${user?.id}` },
+              { label: 'Dashboard', icon: <LayoutDashboard size={18} />, path: '/dashboard' },
+              { label: 'Attendance', icon: <Users size={18} />, path: '/attendance' },
+              { label: 'Salary', icon: <DollarSign size={18} />, path: '/salary' },
+              { label: 'Calendar', icon: <Calendar size={18} />, path: '/calendar' },
+              { label: 'Profile', icon: <User size={18} />, path: `/profile/${user?.id}` },
               { label: 'Settings', icon: <Settings size={18} />, path: '/settings' },
-              { label: 'Contect With HR', icon: <Phone  dText  size={18} />, path: '/emcontect' },
+              { label: 'Contact With HR', icon: <Phone size={18} />, path: '/contact-hr' },
             ].map(({ label, icon, path }) => (
               <button
                 key={path}

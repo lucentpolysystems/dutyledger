@@ -56,16 +56,12 @@ const Login = () => {
         position: "bottom-right",
       });
 
-      // Navigate after login
+      // Navigate after login to clean, modern routes
       setTimeout(() => {
-        if (role === "admin" || role === "super_admin") {
-          navigate("/admin/rbac");
-        } else if (role === "hr") {
-          navigate("/hrhome");
-        } else if (role === "manager" || role === "team_leader") {
-          navigate("/hrhome");
+        if (role === "admin" || role === "super_admin" || role === "hr" || role === "manager" || role === "team_leader") {
+          navigate("/admin/dashboard");
         } else {
-          navigate("/emhome");
+          navigate("/dashboard");
         }
       }, 1200);
 
