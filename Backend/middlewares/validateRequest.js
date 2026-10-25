@@ -23,8 +23,8 @@ export const validateRequest = (schema) => {
         return res.status(400).json({
           success: false,
           message: "Request validation failed",
-          errors: error.errors.map((err) => ({
-            field: err.path.join("."),
+          errors: (error.issues || error.errors || []).map((err) => ({
+            field: Array.isArray(err.path) ? err.path.join(".") : String(err.path),
             message: err.message,
           })),
         });
