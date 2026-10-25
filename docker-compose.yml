@@ -35,9 +35,6 @@ services:
       SMTP_EMAIL: ${SMTP_EMAIL:-hr@lucentpolysystems.com}
       SMTP_PASS: ${SMTP_PASS:-}
       HR_EMAIL: ${HR_EMAIL:-hr@lucentpolysystems.com}
-      CLOUDINARY_NAME: ${CLOUDINARY_NAME:-}
-      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-}
-      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
     depends_on:
       postgres:
         condition: service_healthy

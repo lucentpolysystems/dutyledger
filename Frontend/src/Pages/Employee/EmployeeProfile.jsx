@@ -9,7 +9,6 @@ const EmployeeProfile = () => {
     email: "",
     phone: "",
     department: "",
-    profileImage: "",
   });
 
   const fetchProfile = async () => {

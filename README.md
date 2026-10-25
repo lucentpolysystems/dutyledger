@@ -32,7 +32,7 @@ graph LR
 ```
 
 - **Frontend**: Vite 6, React 19, Tailwind CSS 4, Redux Toolkit, Material-UI, Framer Motion, Recharts.
-- **Backend**: Node.js 20+ (ES Modules), Express 5, Prisma ORM, JWT, Bcrypt, Multer, Nodemailer.
+- **Backend**: Node.js 20+ (ES Modules), Express 5, Prisma ORM, JWT, Bcrypt, Nodemailer.
 - **ORM & Database**: Prisma ORM with PostgreSQL 16 Alpine.
 - **Containerization**: Multi-stage Docker build for client (Node -> Nginx Alpine), optimized Node Alpine for backend, and PostgreSQL service with automated healthchecks.
 - **CI/CD**: GitHub Actions workflow verifying Prisma schema validation, database migrations against test PostgreSQL, frontend production build, and Docker image validation.
@@ -136,7 +136,6 @@ dutyledger/
 │   │   ├── attendanceCopy/       # Daily punch in/out & attendance tracking
 │   │   ├── auth/                 # JWT Authentication & password management
 │   │   ├── calendar/             # Holiday calendar management
-│   │   ├── cloudinary/           # Profile photo uploads
 │   │   ├── contactwithHR/        # Employee queries & HR tickets
 │   │   ├── mail/                 # Nodemailer email alerts
 │   │   ├── payroll/              # Salary structures & payroll generation
